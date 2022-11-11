@@ -2,15 +2,19 @@
 // @ts-nocheck
 import DialogView from "../DialogView.vue";
 import {ref, watch} from 'vue'
-import {Step} from '../../types/step'
 import {EMouseRightMenu} from '../../types'
 import {stepTypes} from './config'
+import useStepStore from '../../stores/step'
+import { storeToRefs } from 'pinia'
+import { StepClass } from '../../types/Step.Class'
+
+const stepStore = useStepStore()
+const { nowScriptTitle } = storeToRefs(stepStore)
 
 const props = defineProps<{
   visible: boolean,
   menuKey: string,
-  stepInfo: Step,
-  filename: string,
+  stepInfo: StepClass,
   parentIds: string[]
 }>()
 const emits = defineEmits(['update:visible', 'refresh'])
@@ -33,7 +37,7 @@ watch(
     }
 )
 
-const formModel = ref<Step>(new Step())
+const formModel = ref<StepClass>(new StepClass())
 
 /**
  * 关闭弹窗
@@ -69,8 +73,14 @@ async function handleSubmit() {
 }
 
 async function createStep() {
+  console.log({
+    filename: nowScriptTitle.value,
+    step: formModel.value.validate(),
+    opera: props.menuKey,
+    parentIds: JSON.parse(JSON.stringify(props.parentIds))
+  })
   const result = await window.ipc.createStep({
-    filename: props.filename,
+    filename: nowScriptTitle.value,
     step: formModel.value.validate(),
     opera: props.menuKey,
     parentIds: JSON.parse(JSON.stringify(props.parentIds))
@@ -83,7 +93,7 @@ async function createStep() {
 
 async function updateStep() {
   const result = await window.ipc.modifyStep({
-    filename: props.filename,
+    filename: nowScriptTitle.value,
     step: formModel.value.validate(),
     parentIds: JSON.parse(JSON.stringify(props.parentIds))
   })
@@ -108,6 +118,10 @@ async function updateStep() {
 <!--            <span class="tag" :style="{ backgroundColor: item.color }">{{ item.name }}</span>-->
           </el-option>
         </el-select>
+      </el-form-item>
+
+      <el-form-item label="下一步等待">
+        <el-input v-model="formModel.lastTime"></el-input>
       </el-form-item>
 
       <el-form-item label="鼠标" v-if="formModel.type === '单击图片'">
@@ -135,13 +149,17 @@ async function updateStep() {
       </template>
 
       <template v-if="formModel.type === '判断日期'">
-        <el-select v-model="formModel.dayType">
-          <el-option label="每周" value="每周"></el-option>
-          <el-option label="每月" value="每月"></el-option>
-        </el-select>
-        <el-select v-model="formModel.day">
-          <el-option v-for="item in (formModel.dayType === '每周' ? 7 : 31)" :label="item + 1" :value="item + 1"></el-option>
-        </el-select>
+        <el-form-item label="频次">
+          <el-select v-model="formModel.dayType">
+            <el-option label="每周" value="每周"></el-option>
+            <el-option label="每月" value="每月"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="时间">
+          <el-select v-model="formModel.day">
+            <el-option v-for="item in (formModel.dayType === '每周' ? 7 : 31)" :label="item + 1" :value="item + 1"></el-option>
+          </el-select>
+        </el-form-item>
       </template>
 
       <el-form-item :label="formModel.type === '等待' ? '等待时间' : '最长等待时间'"
@@ -164,16 +182,16 @@ async function updateStep() {
 
       <el-form-item label="快捷键" v-if="formModel.type === '快捷键'">
         <div class="quick-btn">
-          <el-input v-model="formModel.hotkey[0]"></el-input>
-          <el-input v-model="formModel.hotkey[1]"></el-input>
-          <el-input v-model="formModel.hotkey[2]"></el-input>
+          <el-input v-model="formModel.hotkey[0]" style="width: 60px"></el-input>
+          <el-input v-model="formModel.hotkey[1]" style="width: 60px"></el-input>
+          <el-input v-model="formModel.hotkey[2]" style="width: 60px"></el-input>
         </div>
       </el-form-item>
 
       <el-form-item label="出错是否中断">
         <el-radio-group v-model="formModel.errorStop">
-          <el-radio-button label="True">是</el-radio-button>
-          <el-radio-button label="False">否</el-radio-button>
+          <el-radio-button :label="1">是</el-radio-button>
+          <el-radio-button :label="0">否</el-radio-button>
         </el-radio-group>
       </el-form-item>
 
@@ -187,6 +205,10 @@ async function updateStep() {
   </dialog-view>
 </template>
 
-<style scoped>
-
+<style lang="scss">
+.quick-btn {
+  .el-input + .el-input {
+    margin-left: 10px;
+  }
+}
 </style>

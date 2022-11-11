@@ -1,6 +1,4 @@
-import {Step} from "./step";
-
-export type TStepType = '' | '单击图片' | '判断图片出现'
+import { StepClass } from './Step.Class'
 
 export enum EMouseRightMenu {
     'previous' = '添加上一步',
@@ -10,20 +8,6 @@ export enum EMouseRightMenu {
     'finally' = '判断结束步骤',
     'edit' = '修改步骤',
     'del' = '删除步骤'
-}
-
-export interface IStep {
-    id: string
-    name: string
-    type: TStepType
-    opera: string | string[]
-    success?: IStep[]
-    fail?: IStep[]
-    finally?: IStep[]
-    x?: number
-    y?: number
-    maxTime?: number
-    button?: string
 }
 
 export interface IStepType {
@@ -36,6 +20,13 @@ export interface IArea {
 }
 
 export interface IClickNode {
-    position: { x: number, y: number }
-    nodes: Step[]
+    position: PointerEvent
+    nodes: StepClass[]
+}
+
+export interface IScript {
+    title: string
+    filename: string
+    createdAt: string
+    updatedAt: string
 }

@@ -1,51 +1,56 @@
-<template>
-  <div class="sidebar">
-    <div class="sidebar-nav">
-      <div class="sidebar-logo"></div>
-      <div class="sidebar-title">Python 自动化工具</div>
-    </div>
-    <ul class="sidebar-list">
-      <li v-for="menu of menuList" :key="menu.filename" :class="{ 'active': active === menu.filename }" @click="handleActive(menu.filename)">
-        <span>{{ menu.title }}</span>
-      </li>
-    </ul>
-    <div class="button sidebar-button" @click="handleCreate">添加</div>
-  </div>
-
-  <dialog-view :visible="visible" title="添加自动脚本">
-    <div class="form-item">
-      <el-input v-model="scriptTitle" name="scriptTitle" size="small" placeholder="脚本名称"></el-input>
-    </div>
-    <template #footer>
-      <div class="button" @click="handleClose">取消</div>
-      <div class="button" @click="handleSubmit">确定</div>
-    </template>
-  </dialog-view>
-</template>
-
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import pinyin from 'pinyin'
 import DialogView from '../components/DialogView.vue'
-defineExpose({
-  getScriptList
-})
-const menuList = ref<{ filename: string, title: string }[]>([])
+import useStepStore from '../stores/step'
+import { storeToRefs } from 'pinia'
+import { IScript } from '../types'
+import { ElMessage } from 'element-plus'
+
+const stepStore = useStepStore()
+const { scripts, nowScriptTitle } = storeToRefs(stepStore)
+
+/**
+ * 获取脚本列表
+ */
+async function getScriptList() {
+  const result: IScript[] = await window.ipc.getScriptList()
+  stepStore.changeScripts(result)
+  watchScripts(result)
+}
+
+/**
+ * 选中脚本，查看脚本步骤
+ * @param filename
+ */
+async function handleActive(filename: string) {
+  stepStore.changeScriptTitle(filename)
+}
+
+/**
+ * 根据 scripts 改变当前选中
+ * @param value
+ */
+function watchScripts(value: IScript[]) {
+  console.log(value)
+  if (value.length > 0) {
+    if (!value.some((item: IScript) => item.filename === nowScriptTitle.value)) {
+      handleActive(value[0].filename)
+    }
+  } else {
+    handleActive('')
+  }
+}
+
 onMounted(() => {
   getScriptList()
 })
-async function getScriptList() {
-  menuList.value = await window.ipc.getScriptList()
-  if (menuList.value.length > 0) {
-    if (!menuList.value.some(item => item.filename === active.value)) {
-      active.value = menuList.value[0].filename
-      await handleActive(active.value)
-    }
-  } else {
-    active.value = ''
-  }
 
-}
+watch(
+    () => stepStore.scripts,
+    (value: IScript[]) => watchScripts(value),
+    { deep: true }
+)
 
 const visible = ref<boolean>(false)
 const scriptTitle = ref<string>('')
@@ -57,73 +62,110 @@ function handleClose() {
   visible.value = false
 }
 async function handleSubmit() {
-  const result = await window.ipc.createScript({
+  const { code, msg } = await window.ipc.createScript({
     title: scriptTitle.value,
     pinyin: pinyin(scriptTitle.value, { style: 'normal' }).join('')
   })
-  console.log(result)
-  if (result) {
+  if (code) {
     handleClose()
+    ElMessage.success(msg || '创建成功。')
     await getScriptList()
+  } else {
+    ElMessage.error(msg || '系统出错，创建失败。')
   }
 }
-
-const active = ref<string>('')
-const emits = defineEmits(['active'])
-async function handleActive(filename: string) {
-  active.value = filename
-  emits('active', filename)
-}
 </script>
+
+<template>
+  <div class="sidebar">
+    <div class="sidebar-box">
+
+      <div class="sidebar-nav">
+        <input>
+        <span @click="handleCreate">
+          <i class="iconfont icon-plus"></i>
+        </span>
+      </div>
+
+      <ul class="sidebar-list">
+        <li v-for="menu of scripts" :key="menu.filename"
+            :class="{ 'active': nowScriptTitle === menu.filename }"
+            @click="handleActive(menu.filename)">
+          <span>{{ menu.title }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <dialog-view :visible="visible" title="添加自动脚本">
+    <div class="form-item">
+      <el-input v-model="scriptTitle" name="scriptTitle" size="small" placeholder="脚本名称"></el-input>
+    </div>
+    <template #footer>
+      <el-button size="small" @click="handleClose">取消</el-button>
+      <el-button size="small" type="primary" @click="handleSubmit">确定</el-button>
+    </template>
+  </dialog-view>
+</template>
 
 <style scoped lang="scss">
 .sidebar {
   float: left;
   width: 200px;
   height: 100%;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-  background-color: #f6f8fa;
   position: relative;
 
-  .sidebar-nav {
-    height: 60px;
+  .sidebar-box {
+    background-color: #ededed;
     width: 170px;
-    -webkit-app-region: drag;
+    margin: 10px auto;
+    border-radius: 5px;
+    height: calc(100% - 20px);
+  }
+
+  .sidebar-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #eeeeee;
-    margin: 0 auto;
+    height: 60px;
+    padding: 0 10px;
 
-    .sidebar-logo {
-      width: 40px;
-      height: 40px;
-      background-image: url("../assets/tool.ico");
-      background-size: cover;
-      border-radius: 5px;
+    input {
+      width: 100px;
+      background-color: transparent;
+      outline: none;
+      border: 1px solid #d9d9d9;
+      height: 24px;
+      line-height: 24px;
+      padding-left: 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #333333;
     }
-
-    .sidebar-title {
-      color: #595959;
-      font-size: 14px;
-      font-weight: bold;
+    span {
+      color: #8d8d8d;
+      border-radius: 50%;
+      border: 1px solid #d9d9d9;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+      cursor: pointer;
+      &:hover {
+        border-color: #333333;
+        color: #333333;
+      }
     }
-  }
-
-  .sidebar-button {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    width: 145px;
-    border-radius: 5px;
   }
 }
 
 .sidebar-list {
   list-style: none;
-  padding: 0;
-  margin: 10px;
+  padding: 0 6px;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: calc(100% - 65px);
   li {
     height: 32px;
     line-height: 32px;
@@ -136,14 +178,13 @@ async function handleActive(filename: string) {
     padding: 0 16px;
     margin-bottom: 2px;
     transition: background-color 0.3s;
-    overflow-x: hidden;
-    overflow-y: auto;
+    user-select: none;
     &.active {
-      background-color: #ffffff;
+      background-color: #dadada;
       color: #333333;
       box-shadow: 1px 1px 10px #f0f0f0;
       &:hover {
-        background-color: #ffffff;
+        background-color: #dadada;
         color: #333333;
       }
     }

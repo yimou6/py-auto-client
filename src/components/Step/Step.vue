@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { Step } from '../../types/step'
+import { StepClass } from '../../types/Step.Class'
+import { IClickNode } from '../../types'
 import StepItem from './StepItem.vue'
-import { IClickNode } from './types'
 
 defineProps<{
-  data: Step[]
+  data: StepClass[]
 }>()
 const emits = defineEmits(['click-left', 'click-right'])
 
-function handleClick(step: Step[]) {
+function handleClick(step: StepClass[]) {
   emits('click-left', step)
 }
 
@@ -31,20 +31,5 @@ function handleRightClick(val: IClickNode) {
 .ct-Step {
   height: 100%;
   overflow: auto;
-  &::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-    background-color: #f5f5f5;
-  }
-  &::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    background-color: #f5f5f5;
-  }
-  &::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-    background-color: #c8c8c8;
-  }
 }
 </style>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-// @ts-nocheck
-import { Step } from '../../types/step'
-import { IClickNode } from './types'
+import { IClickNode } from '../../types'
+import { StepClass } from '../../types/Step.Class'
+
 const props = defineProps<{
-  data: Step,
+  data: StepClass,
   parent?: Object
 }>()
 
@@ -11,14 +11,14 @@ const emits = defineEmits(['click-left', 'click-right'])
 
 interface IClickRightNode {
   position: PointerEvent
-  nodes: Step[]
+  nodes: StepClass[]
 }
 
 /**
  * @param val
  */
-function getNodes(val: Step[] | PointerEvent): Step[] {
-  let store: Step[] = []
+function getNodes(val: StepClass[] | PointerEvent): StepClass[] {
+  let store: StepClass[] = []
   if (Object.prototype.toString.call(val) === '[object Array]') {
     store = JSON.parse(JSON.stringify(val))
     store.unshift(props.data)
@@ -30,7 +30,7 @@ function getNodes(val: Step[] | PointerEvent): Step[] {
 
 function getPosition(val: IClickRightNode | PointerEvent) {
   let position: PointerEvent
-  let store: Step[] = []
+  let store: StepClass[] = []
   if (Object.prototype.toString.call(val) === '[object PointerEvent]') {
     position = <PointerEvent>val
     store.unshift(props.data)
@@ -45,7 +45,7 @@ function getPosition(val: IClickRightNode | PointerEvent) {
   }
 }
 
-function handleClick(val: Step[] | PointerEvent) {
+function handleClick(val: StepClass[] | PointerEvent) {
   emits('click-left', getNodes(val))
 }
 

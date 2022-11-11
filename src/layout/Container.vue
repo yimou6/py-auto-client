@@ -1,19 +1,5 @@
 <template>
   <div class="container">
-    <div class="title-container">
-      <div class="tools">
-        <span title="在文件资源管理器打开" @click="handleExplorer()">
-          <i class="iconfont icon-file-open"></i>
-        </span>
-        <span title="删除脚本" @click="handleDelScript()">
-          <i class="iconfont icon-delete"></i>
-        </span>
-      </div>
-      <div class="menu">
-        <span @click="handleMinimize"><i class="iconfont icon-minus"></i></span>
-        <span @click="handleAppClose"><i class="iconfont icon-close"></i></span>
-      </div>
-    </div>
     <div class="step-box">
       <template v-if="stepData.length > 0">
         <CtStep :data="stepData"
@@ -28,10 +14,9 @@
 
     <StepDialog v-model:visible="visible"
                 :menu-key="menuKey"
-                :filename="filename"
                 :step-info="showStep"
                 :parent-ids="parentIds"
-                @refresh="getScript(filename)"></StepDialog>
+                @refresh="getScript"></StepDialog>
 
     <MouseRightMenu v-model:visible="showStepMenu"
                     :step-info="showStep"
@@ -47,76 +32,46 @@ import { nextTick, ref, watch } from 'vue'
 import { IArea, EMouseRightMenu, IClickNode } from "../types";
 import MouseRightMenu from '../components/MouseRightMenu/index.vue'
 import StepDialog from '../components/StepDialog/index.vue'
-import { Step } from '../types/step'
-const props = defineProps({
-  filename: {
-    type: String,
-    default: ''
-  }
-})
-const emits = defineEmits(['del'])
+import { StepClass } from '../types/Step.Class'
+import useStepStore from '../stores/step'
+import { storeToRefs } from 'pinia'
+
+const stepStore = useStepStore()
+const { nowScriptTitle } = storeToRefs(stepStore)
+
 const stepData = ref([])
 const stepDir = ref('')
 
 /**
- * 获取脚本列表
- * @param val
+ * 获取脚本步骤列表
  */
-async function getScript(val: string) {
-  const result = await window.ipc.getSteps(val)
-  if (result) {
-    stepData.value = result.data
-    stepDir.value = result.dir
+async function getScript() {
+  if (nowScriptTitle.value) {
+    const result = await window.ipc.getSteps(nowScriptTitle.value)
+    if (result) {
+      stepData.value = result.data
+      stepDir.value = result.dir
+    }
   }
 }
 watch(
-    () => props.filename,
-    (val) => {
-      getScript(val)
-    }
+    () => stepStore.nowScriptTitle,
+    () => getScript(),
+    { immediate: true }
 )
 
-/**
- * 更新显示的步骤列表
- * @param data
- */
-function handleUpdateData(data: Step[]) {
-  stepData.value = data
-}
-
-/**
- * 最小化
- */
-function handleMinimize() {
-  window.ipc.minimize()
-}
-
-/**
- * 最大化
- */
-function handleAppClose() {
-  window.ipc.appClose()
-}
-
-/**
- * 在文件资源管理器打开
- */
-function handleExplorer() {
-  window.ipc.openExplorer(props.filename)
-}
-
 const visible = ref<boolean>(false)
-const step = ref<Step>(new Step())
+const step = ref<StepClass>(new StepClass())
 const showStepMenu = ref(false)
-const showStep = ref<Step>(new Step())
+const showStep = ref<StepClass>(new StepClass())
 const area = ref<IArea>({ x: 0, y: 0 })
 async function delStep() {
   await window.ipc.deleteStep({
-    filename: props.filename,
+    filename: nowScriptTitle.value,
     step: JSON.parse(JSON.stringify(showStep.value)),
     parentIds: JSON.parse(JSON.stringify(parentIds.value))
   })
-  await getScript(props.filename)
+  await getScript()
 }
 
 
@@ -138,7 +93,7 @@ function handleSelectMenu(key: string) {
  * 立即创建
  */
 function handleCreate() {
-  showStep.value = new Step()
+  showStep.value = new StepClass()
   visible.value = true
   menuKey.value = ''
 }
@@ -148,8 +103,7 @@ let parentIds = ref<string[]>([])
  * 点击步骤
  *  打开修改弹窗
  */
-function handleClickLeft(val: Step[]) {
-  console.log(val)
+function handleClickLeft(val: StepClass[]) {
   visible.value = true
   menuKey.value = EMouseRightMenu.edit
   showStep.value = val[val.length - 1]
@@ -161,7 +115,6 @@ function handleClickLeft(val: Step[]) {
  *  打开右键菜单
  */
 function handleClickRight(val: IClickNode) {
-  console.log('&&', val)
   showStepMenu.value = true
   showStep.value = val.nodes[val.nodes.length - 1]
   parentIds.value = val.nodes.map(item => item.id) || []
@@ -170,87 +123,17 @@ function handleClickRight(val: IClickNode) {
     area.value.y = val.position.y
   })
 }
-
-async function handleDelScript() {
-  await window.ipc.deleteScript(props.filename)
-  emits('del', props.filename)
-}
 </script>
 
 <style scoped lang="scss">
 .container {
   margin-left: 200px;
-  height: 100%;
-  background-color: #ffffff;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-
-  .title-container {
-    height: 32px;
-    -webkit-app-region: drag;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eeeeee;
-
-    .tools {
-      height: 32px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      -webkit-app-region: no-drag;
-      span {
-        display: inline-block;
-        cursor: pointer;
-        color: #353535;
-        width: 24px;
-        height: 24px;
-        line-height: 24px;
-        text-align: center;
-        border-radius: 50%;
-        &:hover {
-          color: #f0f0f0;
-          background-color: #2f82ff;
-        }
-      }
-      span + span {
-        margin-left: 12px;
-      }
-      span:nth-child(2) {
-        &:hover {
-          background-color: #d7365c;
-        }
-      }
-    }
-
-    .menu {
-      height: 32px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 18px;
-      color: #353535;
-      -webkit-app-region: no-drag;
-      border-top-right-radius: 8px;
-      overflow: hidden;
-      span {
-        display: inline-block;
-        width: 32px;
-        height: 32px;
-        line-height: 32px;
-        text-align: center;
-        cursor: pointer;
-        &:hover {
-          background-color: #e0e0e0;
-        }
-      }
-    }
-  }
+  padding-top: 32px;
+  height: calc(100% - 110px);
 
   .step-box {
     padding: 10px;
-    height: 540px;
+    height: 100%;
 
     .step-nodata {
       text-align: center;

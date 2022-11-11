@@ -1,19 +1,20 @@
 <template>
   <div class="layout">
-    <SideBar @active="handleActive" ref="sideBar"/>
-    <Container :filename="filename" @del="handleDel"/>
+    <SideBar/>
+    <NavBar />
+    <FooterNav />
+    <Container />
   </div>
 </template>
 
 <script setup lang="ts">
 import SideBar from './SideBar.vue'
 import Container from './Container.vue'
+import NavBar from './NavBar.vue'
+import FooterNav from './FooterNav.vue'
 import { ref, nextTick } from 'vue'
 
 const filename = ref<string>('')
-function handleActive(val: string) {
-  filename.value = val
-}
 
 const sideBar = ref(null)
 function handleDel(name: string) {

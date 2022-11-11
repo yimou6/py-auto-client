@@ -4,7 +4,7 @@ import type { PropType } from 'vue'
 import { computed} from 'vue'
 import { IArea } from '../../types'
 import { default as vClickOutside } from '../../directives/click-outside'
-import { Step } from '../../types/step'
+import { StepClass } from '../../types/Step.Class'
 
 const props = defineProps({
   area: {
@@ -16,7 +16,7 @@ const props = defineProps({
     default: false
   },
   stepInfo: {
-    type: Object as PropType<Step>,
+    type: Object as PropType<StepClass>,
     default: ''
   }
 })

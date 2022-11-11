@@ -39,6 +39,7 @@
   ],
   "dependencies": {
     "element-plus": "^2.2.19",
+    "pinia": "^2.0.23",
     "pinyin": "^3.0.0-alpha.5",
     "sass": "^1.55.0"
   }

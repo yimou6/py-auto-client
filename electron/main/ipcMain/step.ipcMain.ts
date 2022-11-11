@@ -1,7 +1,7 @@
 import {existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, writeFileSync} from 'fs'
 import { join } from 'path'
 import { existsMkdir, copyImage, rmDir } from '../utils'
-import { Step } from '../utils/step.type'
+import { StepClass } from '../utils/step.type'
 import { EMouseRightMenu } from '../utils/types'
 import { dataDir } from '../utils'
 
@@ -41,31 +41,41 @@ export function getScriptList(): any[] {
 export function createScript(opt: { title: string, pinyin: string }) {
     const dir = join(dataDir, opt.pinyin + '_script')
     // 已有脚本目录则不创建
-    if (existsSync(dir)) return 0
+    if (existsSync(dir)) return { code: 0, msg: '创建失败，已存在该脚本！' }
 
-    // 新建脚本文件夹
-    mkdirSync(dir)
+    try {
+        // 新建脚本文件夹
+        mkdirSync(dir)
 
-    // 新建配置文件
-    const time = new Date().toLocaleString()
-    writeFileSync(
-        join(dir, 'config.json'),
-        JSON.stringify({
-            title: opt.title,
-            filename: opt.pinyin + '_script',
-            createdAt: time,
-            updatedAt: time
-        })
-    )
+        // 新建配置文件
+        const time = new Date().toLocaleString()
+        writeFileSync(
+            join(dir, 'config.json'),
+            JSON.stringify({
+                title: opt.title,
+                filename: opt.pinyin + '_script',
+                createdAt: time,
+                updatedAt: time
+            })
+        )
 
-    // 新建脚本步骤配置文件 step.json
-    writeFileSync(
-        join(dir, 'step.json'),
-        JSON.stringify([])
-    )
-    // 新建脚本图片保存文件夹 images
-    mkdirSync(join(dir, 'images'))
-    return 1
+        // 新建脚本步骤配置文件 step.json
+        writeFileSync(
+            join(dir, 'step.json'),
+            JSON.stringify([])
+        )
+        // 新建脚本图片保存文件夹 images
+        mkdirSync(join(dir, 'images'))
+    } catch (e) {
+        return {
+            code: 0,
+            msg: e.toString()
+        }
+    }
+    return {
+        code: 1,
+        msg: '创建成功！'
+    }
 }
 
 /**
@@ -96,7 +106,7 @@ export function getSteps(filename: string) {
 /**
  * 新建步骤
  */
-export function createStep(opt: { filename: string, step: Step, opera: string, parentIds: string[] }) {
+export function createStep(opt: { filename: string, step: StepClass, opera: string, parentIds: string[] }) {
     const result = getSteps(opt.filename)
     if (result) {
         const needCopyImage = ['单击图片', '双击图片', '判断图片出现']
@@ -130,9 +140,10 @@ export function createStep(opt: { filename: string, step: Step, opera: string, p
 /**
  * 修改步骤
  */
-export function modifyStep(opt: { filename: string, step: Step, parentIds: string[] }) {
+export function modifyStep(opt: { filename: string, step: StepClass, parentIds: string[] }) {
     const result = getSteps(opt.filename)
     if (result) {
+        console.log(opt.step)
         updateStep(result.data, opt.parentIds, opt.step)
         try {
             writeFileSync(
@@ -152,7 +163,7 @@ export function modifyStep(opt: { filename: string, step: Step, parentIds: strin
  * 删除步骤
  * @param opt
  */
-export function deleteStep(opt: { filename: string, step: Step, parentIds: string[] }) {
+export function deleteStep(opt: { filename: string, step: StepClass, parentIds: string[] }) {
     const result = getSteps(opt.filename)
     if (result) {
         delStep(result.data, opt.parentIds, opt.step)
@@ -170,19 +181,24 @@ export function deleteStep(opt: { filename: string, step: Step, parentIds: strin
     return null
 }
 
-function delStep(steps: Step[], parentIds: string[], step: Step) {
+function delStep(steps: StepClass[], parentIds: string[], step: StepClass) {
     writeStepInfo(parentIds, steps, step, '', (data, index) => {
         data.splice(index, 1)
     })
 }
 
 
-function updateStep(data: Step[], parentIds: string[], step: Step) {
+function updateStep(data: StepClass[], parentIds: string[], step: StepClass) {
     writeStepInfo(parentIds, data, step, '', updatedStep)
 }
 
 function updatedStep(data, index, step) {
-    data[index] = step
+    console.log(data[index])
+    for (const key in step) {
+        if (!['success', 'fail', 'finally'].includes(key)) {
+            data[index][key] = step[key]
+        }
+    }
     console.log('success')
 }
 
@@ -194,7 +210,7 @@ function updatedStep(data, index, step) {
  * @param opera
  * @param parentIds
  */
-function createNextStep(data: Step[], step: Step, opera: string, parentIds: string[]) {
+function createNextStep(data: StepClass[], step: StepClass, opera: string, parentIds: string[]) {
     if (opera === EMouseRightMenu.next) {
         if (parentIds.length === 0) {
             data.push(step)
@@ -253,7 +269,7 @@ function writeStepInfo(parentIds, initData, val, opera, callback) {
     })
 }
 
-function findIndex(data: Step[], id: string) {
+function findIndex(data: StepClass[], id: string) {
     return data ? data.findIndex(item => item.id === id) : -1
 }
 

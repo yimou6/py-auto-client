@@ -3,12 +3,13 @@ export type TStepType = '' | '单击图片' | '双击图片' | '判断图片出�
 
 type StepFile = 'button' | 'x' | 'y' | 'maxTime' | 'frequency' | 'hotkey' | 'dayType' | 'day' | 'success' | 'fail' | 'finally'
 
-export class Step {
-    id: string
+export class StepClass {
+    id?: string
     name: string
-    type: TStepType
+    type: string
     opera: string
-    errorStop: 'True' | 'False' // 出错时是否中断
+    lastTime: number // 下一步等待时间
+    errorStop: 0 | 1 // 出错时是否中断
     button?: 'left' | 'right' // 鼠标左键/右键
     x?: number // 坐标x/偏移坐标x
     y?: number // 坐标x/偏移坐标x
@@ -17,23 +18,17 @@ export class Step {
     hotkey?: string[] // 热键/快捷键
     dayType?: string // 日期类型：每月，每周
     day?: number // 具体日期：1-31日；周1-周日
-    success?: Step[] // 判断成功步骤
-    fail?: Step[] // 判断失败步骤
-    finally?: Step[] // 判断结束步骤
+    sleep?: number // 等待时间(sec)
+    success?: StepClass[]
+    fail?: StepClass[]
+    finally?: StepClass[]
 
-    constructor(
-        id?: string,
-        name?: string,
-        type?: TStepType,
-        opera?: string,
-        errorStop?: 'True' | 'False'
-    ) {
-        this.id = id || ''
-        this.name = name || ''
-        this.type = type || ''
-        this.opera = opera || ''
-        this.errorStop = errorStop || 'False'
-        this.clearAllField()
+    constructor() {
+        this.name = ''
+        this.type = ''
+        this.opera = ''
+        this.lastTime = 1
+        this.errorStop = 0
     }
 
     /**
@@ -44,7 +39,8 @@ export class Step {
         this.name = ''
         this.type = ''
         this.opera = ''
-        this.errorStop = 'False'
+        this.lastTime = 1
+        this.errorStop = 0
         this.button = 'left'
         this.x = 0
         this.y = 0
@@ -53,18 +49,20 @@ export class Step {
         this.hotkey = ['', '', '']
         this.dayType = ''
         this.day = 1
+        this.sleep = 1
     }
 
     /**
      * 将source的值复制到object中
      * @param source
      */
-    public copyValue(source: Step) {
+    public copyValue(source: StepClass) {
         this.id = source.id
         this.name = source.name
         this.type = source.type
         this.opera = source.opera
-        this.errorStop = source.errorStop
+        this.lastTime = source.lastTime || 1
+        this.errorStop = source.errorStop || 0
         this.button = source.button || 'left'
         this.x = source.x || 0
         this.y = source.y || 0
@@ -73,6 +71,7 @@ export class Step {
         this.hotkey = source.hotkey || ['', '', '']
         this.dayType = source.dayType || ''
         this.day = source.day || 1
+        this.sleep = source.sleep || 1
     }
 
     /**
@@ -80,12 +79,13 @@ export class Step {
      * 根据type，保留对应type需要的字段
      */
     public validate() {
-        let obj: Step = new Step()
+        let obj = new StepClass()
         obj.id = this.id
         obj.name = this.name
         obj.type = this.type
         obj.opera = this.opera
-        obj.errorStop = this.errorStop
+        obj.lastTime = this.lastTime || 1
+        obj.errorStop = this.errorStop || 0
 
         if (this.type === '单击图片') {
             obj.button = this.button
@@ -124,16 +124,17 @@ export class Step {
             obj.delField(['button', 'maxTime', 'frequency', 'hotkey', 'dayType', 'day'])
         }
         if (this.type === '等待') {
-            obj.x = this.x
-            obj.y = this.y
+            console.log('maxTime', this.maxTime)
+            obj.maxTime = this.maxTime
             obj.delField(['button', 'x', 'y', 'frequency', 'hotkey', 'dayType', 'day'])
         }
         obj.delField(['success', 'fail', 'finally'])
-        return obj
+        return JSON.parse(JSON.stringify(obj))
     }
 
-    private delField(fields: StepFile[]) {
+    private delField(fields: string[]) {
         fields.forEach(field => {
+            // @ts-ignore
             delete this[field]
         })
     }

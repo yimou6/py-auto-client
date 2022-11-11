@@ -7,27 +7,36 @@ import Layout from './layout/layout.vue'
 </template>
 
 <style lang="scss">
-/* CDN 服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
-@font-face {
-  font-family: 'iconfont';  /* Project id 3286450 */
-  src: url('//at.alicdn.com/t/font_3286450_5bx1ggj5p34.woff2?t=1648698334913') format('woff2'),
-  url('//at.alicdn.com/t/font_3286450_5bx1ggj5p34.woff?t=1648698334913') format('woff'),
-  url('//at.alicdn.com/t/font_3286450_5bx1ggj5p34.ttf?t=1648698334913') format('truetype');
-}
 
 html, body {
   width: 100%;
   height: 100%;
   padding: 0;
   margin: 0;
-  background-color: transparent;
+  background-color: #e2e2e2;
 }
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100%;
+  height: calc(100% - 2px);
+  border: 1px solid #333333;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+  background-color: transparent;
+}
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  background-color: #838383;
 }
 
 

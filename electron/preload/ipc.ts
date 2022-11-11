@@ -19,4 +19,5 @@ export default {
     openExplorer: (filename) => ipcRenderer.invoke('openExplorer', filename),
     minimize: () => ipcRenderer.send('minimize'),
     appClose: () => ipcRenderer.send('appClose'),
+    runCmd: (cmd) => ipcRenderer.send('runCmd', cmd)
 }
