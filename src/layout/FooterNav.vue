@@ -10,7 +10,7 @@
         <span>删除脚本</span>
       </div>
     </div>
-    <div class="start" @click="handleRun">直接运行{{nowScriptTitle}}</div>
+    <div class="start" @click="handleRun">直接运行</div>
   </div>
 </template>
 
@@ -34,8 +34,7 @@ function handleExplorer() {
  */
 async function handleDelScript() {
   if (!nowScriptTitle.value) return
-
-  const index = scripts.value.findIndex(script => script.filename = nowScriptTitle.value)
+  const index = scripts.value.findIndex(script => script.filename === nowScriptTitle.value)
   ElMessageBox.confirm(
       `是否确认删除脚本：${scripts.value[index].title}`,
       '提示',

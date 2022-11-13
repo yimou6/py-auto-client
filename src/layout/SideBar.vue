@@ -34,6 +34,7 @@ async function handleActive(filename: string) {
 function watchScripts(value: IScript[]) {
   console.log(value)
   if (value.length > 0) {
+    console.log(nowScriptTitle)
     if (!value.some((item: IScript) => item.filename === nowScriptTitle.value)) {
       handleActive(value[0].filename)
     }

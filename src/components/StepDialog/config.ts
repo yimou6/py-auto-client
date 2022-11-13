@@ -35,5 +35,9 @@ export const stepTypes: IStepType[] = [
     {
         name: '等待',
         color: '#536b42'
+    },
+    {
+        name: '循环',
+        color: '#536b42'
     }
 ]

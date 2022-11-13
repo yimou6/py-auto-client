@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// @ts-nocheck
 import { IClickNode } from '../../types'
 import { StepClass } from '../../types/Step.Class'
 
@@ -12,6 +13,34 @@ const emits = defineEmits(['click-left', 'click-right'])
 interface IClickRightNode {
   position: PointerEvent
   nodes: StepClass[]
+}
+
+function setInfoTxt(data: StepClass) {
+  switch (data.type) {
+    case '快捷键':
+      return `${data.type}: ${data.hotkey?.filter(item => item).join('+')}`
+    case '输入字符':
+      return `${data.type}: ${data.opera}`
+    case '双击图片':
+      return `${data.type}`
+    case '判断日期':
+      return `${data.type}: ${data.dayType}${data.day}`
+    case '单击坐标':
+      return `${data.type}(x=${data.x},y=${data.y})`
+    case '等待':
+      return `${data.type} ${data.maxTime}秒`
+    case '键盘按键':
+      return `${data.type}: 按${data.opera}键${data.frequency}次`
+    case '判断图片出现':
+      return `${data.type}: 等待${data.maxTime}秒`
+    case '单击图片':
+      if (data.x || data.y) {
+        return `${data.type}: 坐标偏移(x=${data.x},y=${data.y})`
+      }
+      return `${data.type}`
+    default:
+      return '未定义'
+  }
 }
 
 /**
@@ -59,7 +88,7 @@ function handleRightClick(val: IClickRightNode | PointerEvent) {
     <div class="step-item-title"
          @click.left.stop="handleClick"
          @click.right.stop="handleRightClick">
-      <span>{{ data.type }}</span>
+      <span>{{ setInfoTxt(data) }}</span>
       <span>{{ data.name }}</span>
     </div>
     <div class="step-item-child">

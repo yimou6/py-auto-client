@@ -46,7 +46,6 @@ const indexHtml = join(process.env.DIST, 'index.html')
 async function createWindow() {
   // 取消顶部菜单栏
   Menu.setApplicationMenu(null)
-
   win = new BrowserWindow({
     title: 'Main window',
     icon: join(process.env.PUBLIC, 'favicon.ico'),
@@ -75,7 +74,7 @@ async function createWindow() {
     app.quit()
   })
   ipcMain.on('runCmd', (event, args) => {
-    exec('python start.py', {
+    exec('start.bat', {
       cwd: path.join(app.getPath('userData'), 'step', args)
     })
   })

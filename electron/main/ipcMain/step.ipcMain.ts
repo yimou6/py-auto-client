@@ -4,6 +4,7 @@ import { existsMkdir, copyImage, rmDir } from '../utils'
 import { StepClass } from '../utils/step.type'
 import { EMouseRightMenu } from '../utils/types'
 import { dataDir } from '../utils'
+import { batStr, pyStr } from './file.config'
 
 /**
  * 获取所有脚本列表
@@ -66,7 +67,19 @@ export function createScript(opt: { title: string, pinyin: string }) {
         )
         // 新建脚本图片保存文件夹 images
         mkdirSync(join(dir, 'images'))
+        // 新建python脚本
+        writeFileSync(
+            join(dir, 'start.py'),
+            pyStr
+        )
+        // 新建bat脚本
+        writeFileSync(
+            join(dir, 'start.bat'),
+            batStr
+        )
     } catch (e) {
+        // 如果创建失败则删除全部已创建的文件和文件夹
+        deleteScript(opt.pinyin + '_script')
         return {
             code: 0,
             msg: e.toString()

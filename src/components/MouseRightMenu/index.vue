@@ -40,15 +40,17 @@ const handleClick = (e: PointerEvent) => {
 
 const menuList = computed(() => {
   let other = []
-  if (props.stepInfo?.type === '判断图片出现') {
+  if (props.stepInfo?.type === '判断图片出现' || props.stepInfo?.type === '循环') {
     if (props.stepInfo.success === undefined) {
       other.push('判断成功步骤')
     }
-    if (props.stepInfo.fail === undefined) {
-      other.push('判断失败步骤')
-    }
-    if (props.stepInfo.finally === undefined) {
-      other.push('判断结束步骤')
+    if (props.stepInfo?.type === '判断图片出现') {
+      if (props.stepInfo.fail === undefined) {
+        other.push('判断失败步骤')
+      }
+      if (props.stepInfo.finally === undefined) {
+        other.push('判断结束步骤')
+      }
     }
     return ['添加上一步', '添加下一步'].concat(other, ['修改步骤', '删除步骤'])
   }

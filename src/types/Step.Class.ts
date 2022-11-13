@@ -9,7 +9,7 @@ export class StepClass {
     x?: number // 坐标x/偏移坐标x
     y?: number // 坐标x/偏移坐标x
     maxTime?: number // 最长等待时间(秒)
-    frequency?: number // 按键次数
+    frequency?: number // 按键次数 、 循环次数
     hotkey?: string[] // 热键/快捷键
     dayType?: string // 日期类型：每月，每周
     day?: number // 具体日期：1-31日；周1-周日
@@ -123,6 +123,10 @@ export class StepClass {
             obj.maxTime = this.maxTime
             obj.delField(['button', 'x', 'y', 'frequency', 'hotkey', 'dayType', 'day'])
         }
+        if (this.type === '循环') {
+            obj.frequency = this.frequency
+            obj.delField(['button', 'maxTime', 'x', 'y', 'hotkey', 'dayType', 'day'])
+        }
         obj.delField(['success', 'fail', 'finally'])
         return JSON.parse(JSON.stringify(obj))
     }
@@ -132,5 +136,44 @@ export class StepClass {
             // @ts-ignore
             delete this[field]
         })
+    }
+
+    public setDefaultValue(type: string) {
+        this.opera = ''
+        this.lastTime = 1
+        this.errorStop = 0
+        switch (type) {
+            case '单击坐标':
+                this.x = 0
+                this.y = 0
+                break
+            case '单击图片':
+                this.x = 0
+                this.y = 0
+                break
+            case '双击图片':
+                this.x = 0
+                this.y = 0
+                break
+            case '判断图片出现':
+                this.maxTime = 2
+                break
+            case '判断日期':
+                this.dayType = '每月'
+                this.day = 1
+                break
+            case '键盘按键':
+                this.frequency = 1
+                break
+            case '快捷键':
+                this.hotkey = ['', '', '']
+                break
+            case '等待':
+                this.maxTime = 2
+                break
+            case '循环':
+                this.frequency = 1
+                break
+        }
     }
 }

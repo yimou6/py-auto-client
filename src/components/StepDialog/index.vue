@@ -50,7 +50,9 @@ function handleClose() {
 /**
  * 步骤类型选择回调
  */
-function typeChange() {}
+function typeChange(val: string) {
+  formModel.value.setDefaultValue(val)
+}
 
 /**
  * 选择图片
@@ -188,6 +190,9 @@ async function updateStep() {
         </div>
       </el-form-item>
 
+      <el-form-item label="循环次数" v-if="formModel.type === '循环'">
+        <el-input v-model="formModel.frequency"></el-input>
+      </el-form-item>
       <el-form-item label="出错是否中断">
         <el-radio-group v-model="formModel.errorStop">
           <el-radio-button :label="1">是</el-radio-button>
