@@ -77,7 +77,7 @@ export class IStep {
                 break
             case '判断图片出现':
                 obj.options.opera = this.options.opera
-                obj.options.waitTime = this.options.presses
+                obj.options.waitTime = this.options.waitTime
                 obj.options.errorStop = this.options.errorStop
                 break
             case '键盘按键':
