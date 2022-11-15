@@ -1,10 +1,10 @@
 <script setup lang="ts">
 // @ts-nocheck
 import type { PropType } from 'vue'
-import { computed} from 'vue'
+import { computed, ref } from 'vue'
 import { IArea } from '../../types'
 import { default as vClickOutside } from '../../directives/click-outside'
-import { StepClass } from '../../types/Step.Class'
+import { IStep } from '../../types/step.type'
 
 const props = defineProps({
   area: {
@@ -16,7 +16,7 @@ const props = defineProps({
     default: false
   },
   stepInfo: {
-    type: Object as PropType<StepClass>,
+    type: Object as PropType<IStep>,
     default: ''
   }
 })
@@ -40,15 +40,16 @@ const handleClick = (e: PointerEvent) => {
 
 const menuList = computed(() => {
   let other = []
-  if (props.stepInfo?.type === '判断图片出现' || props.stepInfo?.type === '循环') {
-    if (props.stepInfo.success === undefined) {
+  if (['判断图片出现', '判断日期', '循环'].includes(props.stepInfo?.type)) {
+    console.log('*', props.stepInfo)
+    if (validArr(props.stepInfo.success)) {
       other.push('判断成功步骤')
     }
-    if (props.stepInfo?.type === '判断图片出现') {
-      if (props.stepInfo.fail === undefined) {
+    if (props.stepInfo?.type === '判断图片出现' || props.stepInfo?.type === '判断日期') {
+      if (validArr(props.stepInfo.fail)) {
         other.push('判断失败步骤')
       }
-      if (props.stepInfo.finally === undefined) {
+      if (validArr(props.stepInfo.last)) {
         other.push('判断结束步骤')
       }
     }
@@ -56,13 +57,37 @@ const menuList = computed(() => {
   }
   return ['添加上一步', '添加下一步', '修改步骤', '删除步骤']
 })
+
+function validArr(arr: IStep[] | undefined) {
+  return arr?.length === 0 || typeof arr === 'undefined'
+}
+
+const menuRef = ref()
+const position = computed(() => {
+
+  if (menuRef.value) {
+    if (props.area?.y > 380) {
+      let y = props.area?.y - menuRef.value.offsetHeight
+      y = y < 0 ? 0 : y
+      return {
+        x: props.area?.x + 5,
+        y
+      }
+    }
+  }
+  return {
+    x: props.area?.x + 5,
+    y: props.area?.y
+  }
+})
 </script>
 
 <template>
   <teleport to="body">
     <div v-if="visible"
+         ref="menuRef"
          class="mouse-right-menu"
-         :style="{ top: area.y + 'px', left: area.x + 'px' }"
+         :style="{ top: position.y + 'px', left: position.x + 'px' }"
          v-click-outside="handleClose">
       <ul @click="handleClick">
         <li v-for="menu of menuList"
@@ -80,7 +105,8 @@ const menuList = computed(() => {
   position: fixed;
   width: 120px;
   background-color: #ffffff;
-  border-radius: 4px;
+  border-radius: 2px;
+  border: 1px solid #545454;
   box-shadow: 1px 2px 12px #999999;
   ul {
     list-style: none;

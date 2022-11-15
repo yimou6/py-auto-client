@@ -9,8 +9,6 @@ export default {
     deleteScript: (filename) => ipcRenderer.invoke('deleteScript', filename),
     // 获取步骤
     getSteps: (filename) => ipcRenderer.invoke('getSteps', filename),
-    // 新建步骤
-    createStep: ({ filename, step, opera, parentIds }) => ipcRenderer.invoke('createStep', { filename, step, opera, parentIds }),
     // 修改步骤
     modifyStep: ({ filename, step, parentIds }) => ipcRenderer.invoke('modifyStep', { filename, step, parentIds }),
     // 删除步骤
@@ -19,5 +17,8 @@ export default {
     openExplorer: (filename) => ipcRenderer.invoke('openExplorer', filename),
     minimize: () => ipcRenderer.send('minimize'),
     appClose: () => ipcRenderer.send('appClose'),
-    runCmd: (cmd) => ipcRenderer.send('runCmd', cmd)
+    runCmd: (cmd) => ipcRenderer.send('runCmd', cmd),
+    // --------------
+    // 添加步骤
+    ipcAddStep: ({ step, parentIds, menuKey, scriptName }) => ipcRenderer.invoke('ipcAddStep', { step, parentIds, menuKey, scriptName })
 }

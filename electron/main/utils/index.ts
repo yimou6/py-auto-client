@@ -44,10 +44,15 @@ export function saveImage(dir, base64) {
  * @param newDir 目标图片地址
  */
 export function copyImage(imageDir: string, newDir: string) {
-    const imgStr = readFileSync(imageDir)
-    const data = saveImage(newDir, imgStr.toString('base64'))
-    if (data) {
-        return join(newDir, data)
+    try {
+        const imgStr = readFileSync(imageDir)
+        const data = saveImage(newDir, imgStr.toString('base64'))
+        if (data) {
+            return join(newDir, data)
+        }
+    } catch (e) {
+        console.log(e)
+        return null
     }
     return null
 }

@@ -3,7 +3,6 @@
     <div class="step-box">
       <template v-if="stepData.length > 0">
         <CtStep :data="stepData"
-                @click-left="handleClickLeft"
                 @click-right="handleClickRight"></CtStep>
       </template>
       <div v-else class="step-nodata">
@@ -12,16 +11,16 @@
       </div>
     </div>
 
-    <StepDialog v-model:visible="visible"
-                :menu-key="menuKey"
-                :step-info="showStep"
-                :parent-ids="parentIds"
-                @refresh="getScript"></StepDialog>
-
     <MouseRightMenu v-model:visible="showStepMenu"
                     :step-info="showStep"
                     :area="area"
                     @select-menu="handleSelectMenu"></MouseRightMenu>
+
+    <steps v-model:visible="visible"
+           :step="showStep"
+           :menu-key="menuKey"
+           :parent-ids="parentIds"
+           @refresh="getScript"></steps>
   </div>
 </template>
 
@@ -30,11 +29,11 @@
 import CtStep from '../components/Step/Step.vue'
 import { nextTick, ref, watch } from 'vue'
 import { IArea, EMouseRightMenu, IClickNode } from "../types";
-import MouseRightMenu from '../components/MouseRightMenu/index.vue'
-import StepDialog from '../components/StepDialog/index.vue'
-import { StepClass } from '../types/Step.Class'
+import MouseRightMenu from '../components/MouseRightMenu/MouseRightMenu.vue'
 import useStepStore from '../stores/step'
 import { storeToRefs } from 'pinia'
+import Steps from '../components/steps/steps.vue'
+import { IStep } from '../types/step.type'
 
 const stepStore = useStepStore()
 const { nowScriptTitle } = storeToRefs(stepStore)
@@ -61,9 +60,9 @@ watch(
 )
 
 const visible = ref<boolean>(false)
-const step = ref<StepClass>(new StepClass())
+const step = ref<IStep>(new IStep())
 const showStepMenu = ref(false)
-const showStep = ref<StepClass>(new StepClass())
+const showStep = ref<IStep>(new IStep())
 const area = ref<IArea>({ x: 0, y: 0 })
 async function delStep() {
   await window.ipc.deleteStep({
@@ -89,25 +88,16 @@ function handleSelectMenu(key: string) {
   }
 }
 
+let parentIds = ref<string[]>([])
+
 /**
  * 立即创建
  */
 function handleCreate() {
-  showStep.value = new StepClass()
+  showStep.value = new IStep()
   visible.value = true
   menuKey.value = ''
-}
-
-let parentIds = ref<string[]>([])
-/**
- * 点击步骤
- *  打开修改弹窗
- */
-function handleClickLeft(val: StepClass[]) {
-  visible.value = true
-  menuKey.value = EMouseRightMenu.edit
-  showStep.value = val[val.length - 1]
-  parentIds.value = val.map(item => item.id) || []
+  parentIds.value = []
 }
 
 /**

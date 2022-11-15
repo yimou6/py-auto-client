@@ -19,7 +19,7 @@ import { release } from 'os'
 import { join } from 'path'
 import registerIpcMain from './ipcMain/index'
 import { exec } from 'child_process'
-// import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
+import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
@@ -100,7 +100,7 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  // await installExtension(VUEJS3_DEVTOOLS)
+  await installExtension(VUEJS3_DEVTOOLS)
   await createWindow()
 })
 

@@ -1,6 +1,6 @@
 {
-  "name": "py-auto-client",
-  "version": "0.0.1",
+  "name": "auto-tool",
+  "version": "1.0.0",
   "main": "dist-electron/main/index.js",
   "description": "A simple tool",
   "license": "MIT",

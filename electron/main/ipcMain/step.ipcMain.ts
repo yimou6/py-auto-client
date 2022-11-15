@@ -117,40 +117,6 @@ export function getSteps(filename: string) {
 }
 
 /**
- * 新建步骤
- */
-export function createStep(opt: { filename: string, step: StepClass, opera: string, parentIds: string[] }) {
-    const result = getSteps(opt.filename)
-    if (result) {
-        const needCopyImage = ['单击图片', '双击图片', '判断图片出现']
-        if (needCopyImage.includes(opt.step.type)) {
-            opt.step.opera = copyImage(
-                opt.step.opera,
-                join(dataDir, opt.filename, 'images')
-            )
-        }
-        opt.step.id = `${Date.now()}`
-        if (opt.parentIds.length > 0) {
-            createNextStep(result.data, opt.step, opt.opera, opt.parentIds)
-        } else {
-            result.data.push(opt.step)
-        }
-
-        try {
-            writeFileSync(
-                join(dataDir, opt.filename, 'step.json'),
-                JSON.stringify(result.data)
-            )
-            return result.data
-        } catch (e) {
-            console.error(e)
-            return null
-        }
-    }
-    return null
-}
-
-/**
  * 修改步骤
  */
 export function modifyStep(opt: { filename: string, step: StepClass, parentIds: string[] }) {
@@ -194,6 +160,45 @@ export function deleteStep(opt: { filename: string, step: StepClass, parentIds: 
     return null
 }
 
+
+export function ipcAddStep(args) {
+    const { step, parentIds, menuKey, scriptName } = args
+    // console.log('新增脚本：')
+    // console.log('step：', step)
+    // console.log('parentIds：', parentIds)
+    // console.log('menuKey：', menuKey)
+    // console.log('scriptName：', scriptName)
+    const result = getSteps(scriptName)
+    if (result) {
+        const needCopyImage = ['点击图片', '判断图片出现']
+        if (needCopyImage.includes(step.type)) {
+            step.options.opera = copyImage(
+                step.options.opera,
+                join(dataDir, scriptName, 'images')
+            )
+        }
+        step.id = `${Date.now()}`
+        if (parentIds.length > 0) {
+            createNextStep(result.data, step, menuKey, parentIds)
+        } else {
+            result.data.push(step)
+        }
+
+        try {
+            writeFileSync(
+                join(dataDir, scriptName, 'step.json'),
+                JSON.stringify(result.data)
+            )
+            return result.data
+        } catch (e) {
+            console.error(e)
+            return null
+        }
+    }
+    return null
+}
+
+
 function delStep(steps: StepClass[], parentIds: string[], step: StepClass) {
     writeStepInfo(parentIds, steps, step, '', (data, index) => {
         data.splice(index, 1)
@@ -208,7 +213,7 @@ function updateStep(data: StepClass[], parentIds: string[], step: StepClass) {
 function updatedStep(data, index, step) {
     console.log(data[index])
     for (const key in step) {
-        if (!['success', 'fail', 'finally'].includes(key)) {
+        if (!['success', 'fail', 'last'].includes(key)) {
             data[index][key] = step[key]
         }
     }
@@ -258,12 +263,12 @@ function writeStepInfo(parentIds, initData, val, opera, callback) {
             if (successIndex === -1) {
                 let failIndex = findIndex(data['fail'], id)
                 if (failIndex === -1) {
-                    let finallyIndex = findIndex(data['finally'], id)
+                    let finallyIndex = findIndex(data['last'], id)
                     if (finallyIndex === -1) {
                         // todo error
                     } else {
                         index = finallyIndex
-                        childKey = 'finally'
+                        childKey = 'last'
                     }
                 } else {
                     index = failIndex
@@ -293,6 +298,6 @@ function addStep(data, index, step, opera) {
 function addChild(data, index, step, opera) {
     const childKey = opera === EMouseRightMenu.success
         ? 'success' : opera === EMouseRightMenu.fail
-            ? 'fail' : 'finally'
+            ? 'fail' : 'last'
     data[index][childKey] = [step]
 }
