@@ -10,6 +10,7 @@ start python start.py
 export const pyStr =
 `
 
+
 import sys
 import pyautogui
 import datetime
@@ -175,14 +176,18 @@ def run(step):
         error_stop = options.get('errorStop')
         loggerText('[{} - {}]: opera={}, x={}, y={}, button={}, clicks={}, error_stop={}'
                    .format(step_type, name, opera, x, y, button, clicks, error_stop))
+       if clicks == 'single':
+            clicks = 1
+        else:
+            clicks = 2
         clickImage(image=opera, error_stop=error_stop, clicks=clicks, button=button, x=x, y=y)
     elif step_type == '判断图片出现':
         opera = options.get('opera')
         wait_time = options.get('waitTime')
         error_stop = options.get('errorStop')
-        success = options.get('success')
-        fail = options.get('fail')
-        last = options.get('last')
+        success = step.get('success')
+        fail = step.get('fail')
+        last = step.get('last')
         loggerText('[{} - {}]: opera={}, wait_time={}, error_stop={}'
                    .format(step_type, name, opera, wait_time, error_stop))
         judgeImageView(image=opera, error_stop=error_stop, max_time=wait_time, success=success, fail=fail, last=last)
@@ -204,6 +209,10 @@ def run(step):
         clicks = options.get('clicks')
         loggerText('[{} - {}]: x={}, y={}, button={} clicks={}'
                    .format(step_type, name, x, y, button, clicks))
+       if clicks == 'single':
+            clicks = 1
+        else:
+            clicks = 2
         clickPosition(x=x, y=y, button=button, clicks=clicks)
     elif step_type == '等待':
         wait_time = options.get('waitTime')
@@ -212,7 +221,7 @@ def run(step):
         wait(sleep=wait_time)
     elif step_type == '循环':
         presses = options.get('presses')
-        success = options.get('success')
+        success = step.get('success')
         loggerText('[{} - {}]: presses={}'
                    .format(step_type, name, presses))
         if success:
@@ -221,9 +230,9 @@ def run(step):
     elif step_type == '判断日期':
         presses = options.get('presses')
         day = options.get('day')
-        success = options.get('success')
-        fail = options.get('fail')
-        last = options.get('last')
+        success = step.get('success')
+        fail = step.get('fail')
+        last = step.get('last')
         loggerText('[{} - {}]: presses={}, day={}'
                    .format(step_type, name, presses, day))
         judgeDate(day_type=presses, day=day, success=success, fail=fail, last=last)
@@ -239,5 +248,6 @@ def readStep():
 
 
 readStep()
+
 
 `
