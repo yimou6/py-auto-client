@@ -8,7 +8,6 @@
 // ├─┬ dist
 // │ └── index.html    > Electron-Renderer
 //
-import * as path from "path";
 
 process.env.DIST_ELECTRON = join(__dirname, '..')
 process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
@@ -18,7 +17,6 @@ import { app, BrowserWindow, shell, ipcMain, Menu } from 'electron'
 import { release } from 'os'
 import { join } from 'path'
 import registerIpcMain from './ipcMain/index'
-import { exec } from 'child_process'
 // import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
 
 // Disable GPU Acceleration for Windows 7
@@ -72,11 +70,6 @@ async function createWindow() {
   ipcMain.handle('appClose', () => {
     win.close()
     app.quit()
-  })
-  ipcMain.handle('runCmd', (event, args) => {
-    exec('start.bat', {
-      cwd: path.join(app.getPath('userData'), 'step', args)
-    })
   })
 
   if (app.isPackaged) {

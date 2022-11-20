@@ -13,8 +13,8 @@ export interface IpcEventMap {
     deleteStep: { filename: string, step: any, parentIds: string[] }
     selectImage: {}
     openExplorer: { filename: string }
-    minimize: {}
-    appClose: {}
+    minimize?: {}
+    appClose?: {}
     runCmd: { cmd: string }
     ipcAddStep: {
         step: any,
@@ -30,5 +30,8 @@ export interface ISendEvent {
     sendEvent: TSendEvent
 }
 
+export type IpcMainFunc<T> = {
+    [Property in keyof T]: (data: T[Property]) => any
+}
 
 

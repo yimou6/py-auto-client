@@ -40,8 +40,8 @@ export function getScriptList(): any[] {
 /**
  * 创建脚本
  */
-export function createScript(opt: { title: string, pinyin: string }) {
-    const dir = join(dataDir, opt.pinyin + '_script')
+export function createScript({ title, pinyin }) {
+    const dir = join(dataDir, pinyin + '_script')
     // 已有脚本目录则不创建
     if (existsSync(dir)) return { code: 0, msg: '创建失败，已存在该脚本！' }
 
@@ -54,8 +54,8 @@ export function createScript(opt: { title: string, pinyin: string }) {
         writeFileSync(
             join(dir, 'config.json'),
             JSON.stringify({
-                title: opt.title,
-                filename: opt.pinyin + '_script',
+                title: title,
+                filename: pinyin + '_script',
                 createdAt: time,
                 updatedAt: time
             })
@@ -81,7 +81,7 @@ export function createScript(opt: { title: string, pinyin: string }) {
     } catch (e) {
         // 如果创建失败则删除全部已创建的文件和文件夹
         deleteScript({
-            filename: opt.pinyin + '_script'
+            filename: pinyin + '_script'
         })
         return {
             code: 0,
@@ -122,16 +122,16 @@ export function getSteps({ filename }) {
 /**
  * 修改步骤
  */
-export function modifyStep(opt: { filename: string, step: StepClass, parentIds: string[] }) {
+export function modifyStep({ filename, step, parentIds }) {
     const result = getSteps({
-        filename: opt.filename
+        filename: filename
     })
     if (result) {
-        console.log(opt.step)
-        updateStep(result.data, opt.parentIds, opt.step)
+        console.log(step)
+        updateStep(result.data, parentIds, step)
         try {
             writeFileSync(
-                join(dataDir, opt.filename, 'step.json'),
+                join(dataDir, filename, 'step.json'),
                 JSON.stringify(result.data)
             )
             return result.data
@@ -147,15 +147,15 @@ export function modifyStep(opt: { filename: string, step: StepClass, parentIds: 
  * 删除步骤
  * @param opt
  */
-export function deleteStep(opt: { filename: string, step: StepClass, parentIds: string[] }) {
+export function deleteStep({ filename, step, parentIds }) {
     const result = getSteps({
-        filename: opt.filename
+        filename: filename
     })
     if (result) {
-        delStep(result.data, opt.parentIds, opt.step)
+        delStep(result.data, parentIds, step)
         try {
             writeFileSync(
-                join(dataDir, opt.filename, 'step.json'),
+                join(dataDir, filename, 'step.json'),
                 JSON.stringify(result.data)
             )
             return result.data
