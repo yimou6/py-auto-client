@@ -110,7 +110,7 @@ function handleSubmit(formEl: FormInstance | undefined) {
 }
 
 async function updateStep(step: any) {
-  const result = await window.ipc.modifyStep({
+  const result = await window.ipcRenderer.sendEvent('modifyStep', {
     filename: nowScriptTitle.value,
     step,
     parentIds: JSON.parse(JSON.stringify(props.parentIds))
@@ -124,7 +124,7 @@ async function updateStep(step: any) {
 
 async function createStep(step: any) {
   console.log({ step, parentIds: props.parentIds, menuKey: props.menuKey, scriptName: nowScriptTitle.value })
-  const result = await window.ipc.ipcAddStep({
+  const result = await window.ipcRenderer.sendEvent('ipcAddStep', {
     step,
     parentIds: JSON.parse(JSON.stringify(props.parentIds)),
     menuKey: props.menuKey,

@@ -7,9 +7,6 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    ATimeline: typeof import('ant-design-vue/es')['Timeline']
-    ATimelineItem: typeof import('ant-design-vue/es')['TimelineItem']
-    RouterLink: typeof import('vue-router')['RouterLink']
-    RouterView: typeof import('vue-router')['RouterView']
   }
 }
+

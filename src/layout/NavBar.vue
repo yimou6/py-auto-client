@@ -15,14 +15,14 @@
  * 最小化
  */
 function handleMinimize() {
-  window.ipc.minimize()
+  window.ipcRenderer.sendEvent('minimize', {})
 }
 
 /**
  * 最大化
  */
 function handleAppClose() {
-  window.ipc.appClose()
+  window.ipcRenderer.sendEvent('appClose', {})
 }
 </script>
 

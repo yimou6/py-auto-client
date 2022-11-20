@@ -14,7 +14,7 @@ const { scripts, nowScriptTitle } = storeToRefs(stepStore)
  * 获取脚本列表
  */
 async function getScriptList() {
-  const result: IScript[] = await window.ipc.getScriptList()
+  const result: IScript[] = await window.ipcRenderer.sendEvent('getScriptList', {})
   stepStore.changeScripts(result)
   watchScripts(result)
 }
@@ -63,7 +63,7 @@ function handleClose() {
   visible.value = false
 }
 async function handleSubmit() {
-  const { code, msg } = await window.ipc.createScript({
+  const { code, msg } = await window.ipcRenderer.sendEvent('createScript', {
     title: scriptTitle.value,
     pinyin: pinyin(scriptTitle.value, { style: 'normal' }).join('')
   })

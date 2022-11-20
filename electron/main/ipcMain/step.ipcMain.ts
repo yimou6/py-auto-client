@@ -6,6 +6,7 @@ import { EMouseRightMenu } from '../utils/types'
 import { dataDir } from '../utils'
 import { batStr, pyStr } from './file.config'
 
+
 /**
  * 获取所有脚本列表
  */
@@ -79,7 +80,9 @@ export function createScript(opt: { title: string, pinyin: string }) {
         )
     } catch (e) {
         // 如果创建失败则删除全部已创建的文件和文件夹
-        deleteScript(opt.pinyin + '_script')
+        deleteScript({
+            filename: opt.pinyin + '_script'
+        })
         return {
             code: 0,
             msg: e.toString()
@@ -94,7 +97,7 @@ export function createScript(opt: { title: string, pinyin: string }) {
 /**
  * 删除脚本
  */
-export function deleteScript(filename) {
+export function deleteScript({ filename }) {
     rmDir(join(dataDir, filename))
     rmdirSync(join(dataDir, filename))
 }
@@ -103,7 +106,7 @@ export function deleteScript(filename) {
  * 获取步骤
  * @param filename
  */
-export function getSteps(filename: string) {
+export function getSteps({ filename }) {
     try {
         const doc = readFileSync(join(dataDir, filename, 'step.json'))
         return {
@@ -120,7 +123,9 @@ export function getSteps(filename: string) {
  * 修改步骤
  */
 export function modifyStep(opt: { filename: string, step: StepClass, parentIds: string[] }) {
-    const result = getSteps(opt.filename)
+    const result = getSteps({
+        filename: opt.filename
+    })
     if (result) {
         console.log(opt.step)
         updateStep(result.data, opt.parentIds, opt.step)
@@ -143,7 +148,9 @@ export function modifyStep(opt: { filename: string, step: StepClass, parentIds: 
  * @param opt
  */
 export function deleteStep(opt: { filename: string, step: StepClass, parentIds: string[] }) {
-    const result = getSteps(opt.filename)
+    const result = getSteps({
+        filename: opt.filename
+    })
     if (result) {
         delStep(result.data, opt.parentIds, opt.step)
         try {

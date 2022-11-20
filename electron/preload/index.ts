@@ -1,15 +1,19 @@
 import './appLoading'
-import { contextBridge } from 'electron'
-import ipc from './ipc'
+import { contextBridge, ipcRenderer } from 'electron'
+import { ISendEvent } from '../../types'
+
+const _ipcRenderer: ISendEvent = {
+  sendEvent: (name, data) => ipcRenderer.invoke(name, data)
+}
 
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld('ipc', ipc)
+    contextBridge.exposeInMainWorld('ipcRenderer', _ipcRenderer)
   } catch (e) {
     console.error(e)
   }
 } else {
-  window["ipc"] = ipc
+  window['ipcRenderer'] = _ipcRenderer
 }
 
 

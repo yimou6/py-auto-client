@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-
+import { ISendEvent } from 'types'
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
@@ -7,6 +7,9 @@ declare module '*.vue' {
   export default component
 }
 
-interface Window {
-  [ipc: string]: any
+declare global {
+  declare interface Window {
+    ipc: any
+    ipcRenderer: ISendEvent
+  }
 }

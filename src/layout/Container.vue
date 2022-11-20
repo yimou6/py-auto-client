@@ -46,7 +46,7 @@ const stepDir = ref('')
  */
 async function getScript() {
   if (nowScriptTitle.value) {
-    const result = await window.ipc.getSteps(nowScriptTitle.value)
+    const result = await window.ipcRenderer.sendEvent('getSteps', { filename: nowScriptTitle.value })
     if (result) {
       stepData.value = result.data
       stepDir.value = result.dir
@@ -65,7 +65,7 @@ const showStepMenu = ref(false)
 const showStep = ref<IStep>(new IStep())
 const area = ref<IArea>({ x: 0, y: 0 })
 async function delStep() {
-  await window.ipc.deleteStep({
+  await window.ipcRenderer.sendEvent('deleteStep', {
     filename: nowScriptTitle.value,
     step: JSON.parse(JSON.stringify(showStep.value)),
     parentIds: JSON.parse(JSON.stringify(parentIds.value))

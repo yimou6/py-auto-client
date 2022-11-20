@@ -1,4 +1,5 @@
 import { rmSync } from 'fs'
+import path from 'path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-electron-plugin'
@@ -38,6 +39,11 @@ export default defineConfig({
   build: {
     assetsDir: '', // #287
   },
+  resolve: {
+    alias: {
+      '@types': path.resolve(__dirname, 'types')
+    }
+  }
 })
 
 function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299) {

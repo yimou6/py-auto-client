@@ -17,7 +17,7 @@ const rules = reactive({})
  * 选择图片
  */
 async function selectImage() {
-  const img = await window.ipc.selectImage()
+  const img = await window.ipcRenderer.sendEvent('selectImage', {})
   props.value.opera = img[0]
 }
 

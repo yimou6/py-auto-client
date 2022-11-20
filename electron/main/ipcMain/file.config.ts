@@ -176,7 +176,7 @@ def run(step):
         error_stop = options.get('errorStop')
         loggerText('[{} - {}]: opera={}, x={}, y={}, button={}, clicks={}, error_stop={}'
                    .format(step_type, name, opera, x, y, button, clicks, error_stop))
-       if clicks == 'single':
+        if clicks == 'single':
             clicks = 1
         else:
             clicks = 2
@@ -209,7 +209,7 @@ def run(step):
         clicks = options.get('clicks')
         loggerText('[{} - {}]: x={}, y={}, button={} clicks={}'
                    .format(step_type, name, x, y, button, clicks))
-       if clicks == 'single':
+        if clicks == 'single':
             clicks = 1
         else:
             clicks = 2

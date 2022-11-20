@@ -66,14 +66,14 @@ async function createWindow() {
   })
   // 注册主进程与渲染进程的通讯
   registerIpcMain()
-  ipcMain.on('minimize', () => {
+  ipcMain.handle('minimize', () => {
     win.minimize()
   })
-  ipcMain.on('appClose', () => {
+  ipcMain.handle('appClose', () => {
     win.close()
     app.quit()
   })
-  ipcMain.on('runCmd', (event, args) => {
+  ipcMain.handle('runCmd', (event, args) => {
     exec('start.bat', {
       cwd: path.join(app.getPath('userData'), 'step', args)
     })

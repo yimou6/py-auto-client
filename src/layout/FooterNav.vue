@@ -26,7 +26,7 @@ const { nowScriptTitle, scripts } = storeToRefs(stepStore)
  * 打开脚本所在文件夹
  */
 function handleExplorer() {
-  window.ipc.openExplorer(nowScriptTitle.value)
+  window.ipcRenderer.sendEvent('openExplorer', { filename: nowScriptTitle.value })
 }
 
 /**
@@ -44,7 +44,9 @@ async function handleDelScript() {
         type: 'warning',
       }
   ).then(() => {
-    window.ipc.deleteScript(nowScriptTitle.value)
+    window.ipcRenderer.sendEvent('deleteScript', {
+      filename: nowScriptTitle.value
+    })
     stepStore.$patch((state) => {
       state.scripts.splice(index, 1)
     })
@@ -55,7 +57,9 @@ async function handleDelScript() {
  * 运行脚本
  */
 function handleRun() {
-  window.ipc.runCmd(nowScriptTitle.value)
+  window.ipcRenderer.sendEvent('runCmd', {
+    cmd: nowScriptTitle.value
+  })
 }
 </script>
 
