@@ -63,7 +63,7 @@ def clickImage(image, error_stop, clicks=1, button='left', x=0, y=0):
         errorStop(error_stop)
 
 
-# 判断图片出现
+# 判断图片
 def judgeImageView(image, error_stop, success, fail, last, max_time=2):
     i = 0
     position = None
@@ -88,7 +88,7 @@ def judgeImageView(image, error_stop, success, fail, last, max_time=2):
             run(last_task)
 
 
-# 判断日期
+# 判断时间
 def judgeDate(day_type, day, success, fail, last):
     if day_type == 1:
         if datetime.datetime.now().strftime('%d') == day:
@@ -181,7 +181,7 @@ def run(step):
         else:
             clicks = 2
         clickImage(image=opera, error_stop=error_stop, clicks=clicks, button=button, x=x, y=y)
-    elif step_type == '判断图片出现':
+    elif step_type == '判断图片':
         opera = options.get('opera')
         wait_time = options.get('waitTime')
         error_stop = options.get('errorStop')
@@ -227,7 +227,7 @@ def run(step):
         if success:
             loopTask(frequency=presses, success=success)
 
-    elif step_type == '判断日期':
+    elif step_type == '判断时间':
         presses = options.get('presses')
         day = options.get('day')
         success = step.get('success')

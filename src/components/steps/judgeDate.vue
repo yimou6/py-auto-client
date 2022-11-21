@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 判断日期
+ * 判断时间
  */
 import { ref, reactive } from 'vue'
 import type { FormInstance } from 'element-plus'

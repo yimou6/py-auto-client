@@ -1,7 +1,6 @@
 import {existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, writeFileSync} from 'fs'
 import { join } from 'path'
 import { existsMkdir, copyImage, rmDir } from '../utils'
-import { StepClass } from '../utils/step.type'
 import { EMouseRightMenu } from '../utils/types'
 import { dataDir } from '../utils'
 import { batStr, pyStr } from './file.config'
@@ -175,9 +174,9 @@ export function ipcAddStep(args) {
     // console.log('parentIds：', parentIds)
     // console.log('menuKey：', menuKey)
     // console.log('scriptName：', scriptName)
-    const result = getSteps(scriptName)
+    const result = getSteps({ filename: scriptName })
     if (result) {
-        const needCopyImage = ['点击图片', '判断图片出现']
+        const needCopyImage = ['点击图片', '判断图片']
         if (needCopyImage.includes(step.type)) {
             step.options.opera = copyImage(
                 step.options.opera,
@@ -206,14 +205,14 @@ export function ipcAddStep(args) {
 }
 
 
-function delStep(steps: StepClass[], parentIds: string[], step: StepClass) {
+function delStep(steps: any[], parentIds: string[], step: any) {
     writeStepInfo(parentIds, steps, step, '', (data, index) => {
         data.splice(index, 1)
     })
 }
 
 
-function updateStep(data: StepClass[], parentIds: string[], step: StepClass) {
+function updateStep(data: any[], parentIds: string[], step: any) {
     writeStepInfo(parentIds, data, step, '', updatedStep)
 }
 
@@ -235,7 +234,7 @@ function updatedStep(data, index, step) {
  * @param opera
  * @param parentIds
  */
-function createNextStep(data: StepClass[], step: StepClass, opera: string, parentIds: string[]) {
+function createNextStep(data: any[], step: any, opera: string, parentIds: string[]) {
     if (opera === EMouseRightMenu.next) {
         if (parentIds.length === 0) {
             data.push(step)
@@ -294,7 +293,7 @@ function writeStepInfo(parentIds, initData, val, opera, callback) {
     })
 }
 
-function findIndex(data: StepClass[], id: string) {
+function findIndex(data: any[], id: string) {
     return data ? data.findIndex(item => item.id === id) : -1
 }
 

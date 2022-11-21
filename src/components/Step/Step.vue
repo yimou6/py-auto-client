@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { IStep } from '../../types/step.type'
-import { IClickNode } from '../../types'
+import { Step, IClickRightNode } from '../../../types'
 import StepItem from './StepItem.vue'
 
 defineProps<{
-  data: IStep[]
+  data: Step[]
 }>()
 const emits = defineEmits(['click-left', 'click-right'])
 
-function handleClick(step: IStep[]) {
+function handleClick(step: Step[]) {
   emits('click-left', step)
 }
 
-function handleRightClick(val: IClickNode) {
+function handleRightClick(val: IClickRightNode) {
   emits('click-right', val)
 }
 </script>

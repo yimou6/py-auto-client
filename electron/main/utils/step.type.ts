@@ -1,4 +1,4 @@
-export type TStepType = '' | '单击图片' | '双击图片' | '判断图片出现' | '判断日期' | '输入字符' | '键盘按键' | '快捷键' | '单击坐标' | '等待'
+export type TStepType = '' | '单击图片' | '双击图片' | '判断图片' | '判断时间' | '输入字符' | '键盘按键' | '快捷键' | '单击坐标' | '等待'
 
 
 type StepFile = 'button' | 'x' | 'y' | 'maxTime' | 'frequency' | 'hotkey' | 'dayType' | 'day' | 'success' | 'fail' | 'finally'
@@ -98,11 +98,11 @@ export class StepClass {
             obj.y = this.y
             obj.delField(['button', 'maxTime', 'frequency', 'hotkey', 'dayType', 'day'])
         }
-        if (this.type === '判断图片出现') {
+        if (this.type === '判断图片') {
             obj.maxTime = this.maxTime
             obj.delField(['button', 'x', 'y', 'frequency', 'hotkey', 'dayType', 'day'])
         }
-        if (this.type === '判断日期') {
+        if (this.type === '判断时间') {
             obj.dayType = this.dayType
             obj.day = this.day
             obj.delField(['button', 'x', 'y', 'frequency', 'hotkey'])

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 判断图片出现
+ * 判断图片
  */
 import { ref, reactive } from 'vue'
 import type { FormInstance } from 'element-plus'

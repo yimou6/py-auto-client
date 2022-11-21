@@ -4,7 +4,7 @@ import pinyin from 'pinyin'
 import DialogView from '../components/DialogView.vue'
 import useStepStore from '../stores/step'
 import { storeToRefs } from 'pinia'
-import { IScript } from '../types'
+import { IScript } from '../../types'
 import { ElMessage } from 'element-plus'
 
 const stepStore = useStepStore()

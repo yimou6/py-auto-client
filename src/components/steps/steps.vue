@@ -12,8 +12,8 @@ import KeyboardHot from '../steps/keyboardHot.vue'
 import ClickPosition from '../steps/clickPosition.vue'
 import WaitTime from '../steps/waitTime.vue'
 import LoopStep from '../steps/loopStep.vue'
-import { IStep } from '../../types/step.type'
-import { EMouseRightMenu } from '../../types'
+import { Step } from '../../../types'
+import { EMouseRightMenu } from '../../../types'
 import useStepStore from '../../stores/step'
 import { storeToRefs } from 'pinia'
 
@@ -36,18 +36,18 @@ interface IType {
 const title = ref<string>('新增')
 const typeList: IType[] = [
   { name: '点击图片', component:ClickImage },
-  { name: '判断图片出现', component: JudgeImage },
+  { name: '判断图片', component: JudgeImage },
   { name: '键盘按键', component: Keyboard },
   { name: '输入字符', component: WriteChar },
   { name: '快捷键', component: KeyboardHot },
   { name: '单击坐标', component: ClickPosition },
   { name: '等待', component: WaitTime },
   { name: '循环', component: LoopStep },
-  { name: '判断日期', component: JudgeDate }
+  { name: '判断时间', component: JudgeDate }
 ]
 
 const formRef = ref<FormInstance>()
-const formModel = ref<IStep>(new IStep())
+const formModel = ref<Step>(new Step())
 
 const rules = reactive({
   name: [
@@ -71,10 +71,10 @@ watch(
       if (val) {
         if (props.menuKey === EMouseRightMenu.edit) {
           title.value = '修改'
-          formModel.value.copyValue(props.step)
+          formModel.value.setValue(props.step)
         } else {
           title.value = '新增'
-          formModel.value.clearAllValue()
+          formModel.value.clear()
         }
       }
     }
@@ -97,11 +97,11 @@ function handleSubmit(formEl: FormInstance | undefined) {
     if (valid) {
       comRef.value.validate((v: boolean) => {
         if (v) {
-          console.log('提交源数据：', formModel.value.formatterStepData())
+          console.log('提交源数据：', formModel.value.getValue())
           if (title.value === '新增') {
-            createStep(formModel.value.formatterStepData())
+            createStep(formModel.value.getValue())
           } else {
-            updateStep(formModel.value.formatterStepData())
+            updateStep(formModel.value.getValue())
           }
         }
       })

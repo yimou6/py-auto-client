@@ -2,9 +2,8 @@
 // @ts-nocheck
 import type { PropType } from 'vue'
 import { computed, ref } from 'vue'
-import { IArea } from '../../types'
 import { default as vClickOutside } from '../../directives/click-outside'
-import { IStep } from '../../types/step.type'
+import { IArea, Step } from '../../../types'
 
 const props = defineProps({
   area: {
@@ -16,7 +15,7 @@ const props = defineProps({
     default: false
   },
   stepInfo: {
-    type: Object as PropType<IStep>,
+    type: Object as PropType<Step>,
     default: ''
   }
 })
@@ -40,12 +39,12 @@ const handleClick = (e: PointerEvent) => {
 
 const menuList = computed(() => {
   let other = []
-  if (['判断图片出现', '判断日期', '循环'].includes(props.stepInfo?.type)) {
+  if (['判断图片', '判断时间', '循环'].includes(props.stepInfo?.type)) {
     console.log('*', props.stepInfo)
     if (validArr(props.stepInfo.success)) {
       other.push('判断成功步骤')
     }
-    if (props.stepInfo?.type === '判断图片出现' || props.stepInfo?.type === '判断日期') {
+    if (props.stepInfo?.type === '判断图片' || props.stepInfo?.type === '判断时间') {
       if (validArr(props.stepInfo.fail)) {
         other.push('判断失败步骤')
       }
@@ -58,7 +57,7 @@ const menuList = computed(() => {
   return ['添加上一步', '添加下一步', '修改步骤', '删除步骤']
 })
 
-function validArr(arr: IStep[] | undefined) {
+function validArr(arr: Step[] | undefined) {
   return arr?.length === 0 || typeof arr === 'undefined'
 }
 

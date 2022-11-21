@@ -28,12 +28,11 @@
 // @ts-nocheck
 import CtStep from '../components/Step/Step.vue'
 import { nextTick, ref, watch } from 'vue'
-import { IArea, EMouseRightMenu, IClickNode } from "../types";
 import MouseRightMenu from '../components/MouseRightMenu/MouseRightMenu.vue'
 import useStepStore from '../stores/step'
 import { storeToRefs } from 'pinia'
 import Steps from '../components/steps/steps.vue'
-import { IStep } from '../types/step.type'
+import { IClickRightNode, Step, IArea, EMouseRightMenu } from '../../types'
 
 const stepStore = useStepStore()
 const { nowScriptTitle } = storeToRefs(stepStore)
@@ -60,9 +59,9 @@ watch(
 )
 
 const visible = ref<boolean>(false)
-const step = ref<IStep>(new IStep())
+const step = ref<Step>(new Step())
 const showStepMenu = ref(false)
-const showStep = ref<IStep>(new IStep())
+const showStep = ref<Step>(new Step())
 const area = ref<IArea>({ x: 0, y: 0 })
 async function delStep() {
   await window.ipcRenderer.sendEvent('deleteStep', {
@@ -94,7 +93,7 @@ let parentIds = ref<string[]>([])
  * 立即创建
  */
 function handleCreate() {
-  showStep.value = new IStep()
+  showStep.value = new Step()
   visible.value = true
   menuKey.value = ''
   parentIds.value = []
@@ -104,7 +103,7 @@ function handleCreate() {
  * 右键点击步骤
  *  打开右键菜单
  */
-function handleClickRight(val: IClickNode) {
+function handleClickRight(val: IClickRightNode) {
   showStepMenu.value = true
   showStep.value = val.nodes[val.nodes.length - 1]
   parentIds.value = val.nodes.map(item => item.id) || []

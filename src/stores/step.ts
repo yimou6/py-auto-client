@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { IScript } from '../types'
+import { IScript } from '../../types'
 
 const useStepStore = defineStore('step', {
     state: () => ({

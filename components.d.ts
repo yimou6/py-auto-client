@@ -7,6 +7,30 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    ClickImage: typeof import('./src/components/steps/clickImage.vue')['default']
+    ClickPosition: typeof import('./src/components/steps/clickPosition.vue')['default']
+    DialogView: typeof import('./src/components/DialogView.vue')['default']
+    ElButton: typeof import('element-plus/es')['ElButton']
+    ElForm: typeof import('element-plus/es')['ElForm']
+    ElFormItem: typeof import('element-plus/es')['ElFormItem']
+    ElImage: typeof import('element-plus/es')['ElImage']
+    ElInput: typeof import('element-plus/es')['ElInput']
+    ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
+    ElOption: typeof import('element-plus/es')['ElOption']
+    ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
+    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
+    ElSelect: typeof import('element-plus/es')['ElSelect']
+    ElSelectV2: typeof import('element-plus/es')['ElSelectV2']
+    JudgeDate: typeof import('./src/components/steps/judgeDate.vue')['default']
+    JudgeImage: typeof import('./src/components/steps/judgeImage.vue')['default']
+    Keyboard: typeof import('./src/components/steps/keyboard.vue')['default']
+    KeyboardHot: typeof import('./src/components/steps/keyboardHot.vue')['default']
+    LoopStep: typeof import('./src/components/steps/loopStep.vue')['default']
+    MouseRightMenu: typeof import('./src/components/MouseRightMenu/MouseRightMenu.vue')['default']
+    Step: typeof import('./src/components/Step/Step.vue')['default']
+    StepItem: typeof import('./src/components/Step/StepItem.vue')['default']
+    Steps: typeof import('./src/components/steps/steps.vue')['default']
+    WaitTime: typeof import('./src/components/steps/waitTime.vue')['default']
+    WriteChar: typeof import('./src/components/steps/writeChar.vue')['default']
   }
 }
-
