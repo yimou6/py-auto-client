@@ -1,5 +1,7 @@
 <template>
   <div class="container">
+    <FooterNav />
+
     <div class="step-box">
       <template v-if="stepData.length > 0">
         <CtStep :data="stepData"
@@ -27,6 +29,7 @@
 <script setup lang="ts">
 // @ts-nocheck
 import CtStep from '../components/Step/Step.vue'
+import FooterNav from './FooterNav.vue'
 import { nextTick, ref, watch } from 'vue'
 import MouseRightMenu from '../components/MouseRightMenu/MouseRightMenu.vue'
 import useStepStore from '../stores/step'
@@ -117,12 +120,13 @@ function handleClickRight(val: IClickRightNode) {
 <style scoped lang="scss">
 .container {
   margin-left: 200px;
-  padding-top: 32px;
-  height: calc(100% - 110px);
+  height: 100%;
+  border-left: 1px solid #dfdfdf;
+  border-bottom: 1px solid #dfdfdf;
 
   .step-box {
-    padding: 10px;
-    height: 100%;
+    padding: 10px 2px 10px 10px;
+    height: calc(100% - 52px);
 
     .step-nodata {
       text-align: center;

@@ -139,7 +139,7 @@ async function createStep(step: any) {
 </script>
 
 <template>
-  <dialog-view v-model:visible="visible" :title="title">
+  <dialog-view :visible="visible" :title="title">
     <el-form size="small"
              label-width="85px"
              ref="formRef"

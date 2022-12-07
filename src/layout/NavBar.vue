@@ -1,11 +1,14 @@
 <template>
   <div class="nav-bar">
-    <span @click="handleMinimize">
+    <img src="../assets/tool.ico" alt="ico">
+    <div>
+      <span @click="handleMinimize">
       <i class="iconfont icon-minus"></i>
     </span>
-    <span @click="handleAppClose">
+      <span @click="handleAppClose">
       <i class="iconfont icon-close"></i>
     </span>
+    </div>
   </div>
 </template>
 
@@ -28,17 +31,19 @@ function handleAppClose() {
 
 <style scoped lang="scss">
 .nav-bar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  color: #adadad;
   height: 32px;
-  width: 612px;
-  z-index: 999;
+  width: 100%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   -webkit-app-region: drag;
+  background-color: #ffffff;
+  border-bottom: 1px solid #dfdfdf;
+  img {
+    width: 24px;
+    height: 24px;
+    margin-left: 10px;
+  }
   span {
     -webkit-app-region: no-drag;
     display: inline-block;
@@ -47,14 +52,11 @@ function handleAppClose() {
     text-align: center;
     line-height: 32px;
     cursor: pointer;
-    background-color: #333333;
+    color: #606060;
     &:hover {
       background-color: #8d8d8d;
       color: #f0f0f0;
     }
-  }
-  span:nth-child(1) {
-    border-bottom-left-radius: 10px;
   }
 }
 </style>

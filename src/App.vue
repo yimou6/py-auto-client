@@ -13,7 +13,6 @@ html, body {
   height: 100%;
   padding: 0;
   margin: 0;
-  background-color: #e2e2e2;
 }
 
 #app {

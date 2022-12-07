@@ -78,9 +78,52 @@ function handleRightClick(val: IClickRightNode | MouseEvent) {
     <div class="step-item-title"
          @click.left.stop="handleClick"
          @click.right.stop="handleRightClick">
-      <span>{{ setInfoTxt(data) }}</span>
-      <span>{{ data.name }}</span>
+      <div class="step-item-image" v-if="data.type.indexOf('图片') > -1">
+        <img :src="data.options.opera" alt="图片">
+      </div>
+      <div class="step-item-info">
+        <div class="step-item-info-item">
+          <div class="step-item-info-item__type">{{ data.type }}</div>
+        </div>
+        <div class="step-item-info-item">
+          <div class="step-item-info-item__options" v-if="data.options.waitTime">
+            {{ data.type === '判断图片' ? '最多' : '' }}
+            等待 <strong>{{data.options.waitTime}}秒</strong>
+          </div>
+          <div class="step-item-info-item__options" v-if="data.options.button">
+            {{ data.options.button === 'left' ? '鼠标左键' : '鼠标右键' }}
+          </div>
+          <div class="step-item-info-item__options" v-if="data.options.clicks">
+            {{ data.options.clicks === 'single' ? '单击' : '双击'}}
+          </div>
+          <div class="step-item-info-item__options" v-if="data.options.x !== undefined">
+            坐标： {{ `${data.options.x} x ${data.options.x}` }}
+          </div>
+          <div class="step-item-info-item__options" v-if="data.options.presses && data.type === '循环'">
+            循环 <strong>{{data.options.presses}}</strong> 次
+          </div>
+          <div class="step-item-info-item__options" v-if="data.options.opera && ['键盘按键', '输入字符'].includes(data.type)">
+            <template v-if="data.type === '键盘按键'">
+              按 <strong>{{ data.options.presses }}</strong> 次【 <strong>{{ data.options.opera }}</strong> 】键
+            </template>
+            <template v-if="data.type === '输入字符'">
+              输入【 <strong>{{ data.options.opera }}</strong> 】
+            </template>
+          </div>
+          <div class="step-item-info-item__options" v-if="data.type === '判断时间'">
+            {{ data.options.presses === 0 ? '每周' : '每月' }}
+            {{ data.options.day }}
+            {{ data.options.presses === 0 ? '' : '日' }}
+          </div>
+        </div>
+        <div class="step-item-info-item">
+          <div class="step-item-info-item__nextWait">等待 <strong>{{ data.nextWait }}秒</strong> 后进行下一步</div>
+          <div class="step-item-info-item__errorStop" v-if="data.options.errorStop !== undefined">失败后<strong>{{ data.options.errorStop === 0 ? '继续下一步' : '终止运行' }}</strong></div>
+        </div>
+      </div>
+
     </div>
+
     <div class="step-item-child">
       <template v-if="data.success">
         <StepItem v-for="item of data.success"
@@ -92,7 +135,6 @@ function handleRightClick(val: IClickRightNode | MouseEvent) {
                   @click-right="handleRightClick"></StepItem>
       </template>
     </div>
-
     <div class="step-item-child">
       <template v-if="data.fail">
         <StepItem v-for="item of data.fail"
@@ -120,47 +162,75 @@ function handleRightClick(val: IClickRightNode | MouseEvent) {
 
 <style scoped lang="scss">
 .step-item {
-  cursor: pointer;
+  border-radius: 3px;
+  border: 1px solid #f0f0f0;
+  width: 570px;
+  & + .step-item {
+    margin-top: 8px;
+  }
+
+  &:hover {
+    border-color: #00ca53;
+  }
+
   &-title {
     font-size: 14px;
     padding: 4px 0 4px 4px;
     position: relative;
-    &:hover {
-      background-color: #f0f0f0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    .step-item-image {
+      width: 50px;
+      height: 50px;
+      border:  1px solid #dfdfdf;
+      background-color: #4d4d4d;
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 10px;
+      img {
+        max-width: 48px;
+        max-height: 48px;
+      }
     }
-    span:nth-child(1) {
-      font-size: 12px;
-      color: #727272;
-      background-color: #c0c0c0;
-      border-radius: 2px;
-      padding: 1px 6px;
-      display: inline-block;
-      margin-right: 8px;
+
+    .step-item-info {
+      .step-item-info-item {
+        display: flex;
+        justify-content: flex-start;
+        font-size: 12px;
+        font-weight: lighter;
+        color: #ffffff;
+        div {
+          padding: 1px 4px;
+          border-radius: 2px;
+          user-select: none;
+        }
+        &__type {
+          background-color: #519a73;
+        }
+        &__nextWait {
+          background-color: #7397ab;
+        }
+        &__options {
+          background-color: #a29b7c;
+        }
+        &__errorStop {
+          background-color: #ffb3a7;
+        }
+        div + div {
+          margin-left: 5px;
+        }
+        & + .step-item-info-item {
+          margin-top: 2px;
+        }
+      }
     }
-    span:nth-child(2) {
-      font-size: 12px;
-      color: #404040;
-      font-weight: bold;
-    }
-  }
-  .step-item-success .step-item-title:before {
-    background-color: green;
-  }
-  .step-item-fail .step-item-title:before {
-    background-color: red;
-  }
-  .step-item-finally .step-item-title:before {
-    background-color: gray;
-  }
-  .step-item:first-child .step-item-title:before{
-    height: 22px;
-    top: 4px;
-    border-top-right-radius: 4px;
-  }
-  .step-item:last-child .step-item-title:before{
-    height: 22px;
-    bottom: 4px;
-    border-bottom-right-radius: 4px;
   }
 }
 

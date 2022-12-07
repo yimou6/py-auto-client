@@ -1,16 +1,14 @@
 <template>
   <div class="footer-nav">
-    <div class="btn">
-      <div class="btn-item" title="在文件资源管理器打开" @click="handleExplorer">
-        <i class="iconfont icon-file-open"></i>
-        <span>打开文件夹</span>
-      </div>
-      <div class="btn-item" title="删除脚本" @click="handleDelScript">
-        <i class="iconfont icon-delete"></i>
-        <span>删除脚本</span>
-      </div>
+    <div @click="handleExplorer" title="打开文件夹">
+      <i class="iconfont icon-file-open"></i>
     </div>
-    <div class="start" @click="handleRun">直接运行</div>
+    <div @click="handleDelScript" title="删除脚本">
+      <i class="iconfont icon-delete"></i>
+    </div>
+    <div @click="handleRun" title="运行">
+      <i class="iconfont icon-play"></i>
+    </div>
   </div>
 </template>
 
@@ -65,47 +63,28 @@ function handleRun() {
 
 <style scoped lang="scss">
 .footer-nav {
-  position: fixed;
-  bottom: 10px;
-  right: 20px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  width: 580px;
-  height: 45px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
+  height: 30px;
+  border-bottom: 1px solid #dfdfdf;
+  padding: 0 10px;
 
-  .btn {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding-left: 10px;
-    &-item {
-      font-size: 12px;
-      cursor: pointer;
-      &:hover {
-        font-weight: bold;
-      }
-    }
-    .btn-item + .btn-item {
+  div {
+    color: #333333;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    width: 26px;
+    height: 26px;
+    text-align: center;
+    line-height: 27px;
+    border-radius: 2px;
+    & + div {
       margin-left: 10px;
     }
-  }
-
-  .start {
-    background-color: #333333;
-    border-radius: 10px;
-    color: #ffffff;
-    height: 45px;
-    width: 180px;
-    text-align: center;
-    line-height: 45px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
     &:hover {
-      background-color: #3f3f3f;
+      border-color: #00ca53;
     }
   }
 }

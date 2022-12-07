@@ -1,9 +1,10 @@
 <template>
   <div class="layout">
-    <SideBar/>
     <NavBar />
-    <FooterNav />
-    <Container />
+    <div class="layout-warp">
+      <SideBar/>
+      <Container />
+    </div>
   </div>
 </template>
 
@@ -11,7 +12,6 @@
 import SideBar from './SideBar.vue'
 import Container from './Container.vue'
 import NavBar from './NavBar.vue'
-import FooterNav from './FooterNav.vue'
 import { ref, nextTick } from 'vue'
 
 const filename = ref<string>('')
@@ -32,5 +32,8 @@ function handleDel(name: string) {
 .layout {
   width: 100%;
   height: 100%;
+  &-warp {
+    height: calc(100% - 42px);
+  }
 }
 </style>

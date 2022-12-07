@@ -82,10 +82,12 @@ async function handleSubmit() {
     <div class="sidebar-box">
 
       <div class="sidebar-nav">
-        <input>
-        <span @click="handleCreate">
+
+        <div class="sidebar-nav-create" @click="handleCreate">
           <i class="iconfont icon-plus"></i>
-        </span>
+          <span>新建</span>
+        </div>
+
       </div>
 
       <ul class="sidebar-list">
@@ -117,44 +119,40 @@ async function handleSubmit() {
   position: relative;
 
   .sidebar-box {
-    background-color: #ededed;
-    width: 170px;
+    background-color: #4d4d4d;
+    width: 180px;
     margin: 10px auto;
-    border-radius: 5px;
-    height: calc(100% - 20px);
+    border-radius: 10px;
+    height: calc(100% - 10px);
   }
 
   .sidebar-nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    height: 60px;
-    padding: 0 10px;
+    height: 50px;
 
-    input {
-      width: 100px;
-      background-color: transparent;
-      outline: none;
-      border: 1px solid #d9d9d9;
-      height: 24px;
-      line-height: 24px;
-      padding-left: 16px;
-      border-radius: 12px;
-      font-size: 12px;
-      color: #333333;
-    }
-    span {
-      color: #8d8d8d;
-      border-radius: 50%;
-      border: 1px solid #d9d9d9;
-      width: 24px;
-      height: 24px;
-      line-height: 24px;
+    &-create {
+      background-color: #00ca53;
+      width: 160px;
+      height: 32px;
+      line-height: 31px;
       text-align: center;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: bold;
+      position: relative;
+      border-radius: 6px;
+      border: none;
+      user-select: none;
+      outline: none;
       cursor: pointer;
+      i {
+        display: inline-block;
+        margin-right: 10px;
+      }
       &:hover {
-        border-color: #333333;
-        color: #333333;
+        background-color: rgba(0, 202, 83, 0.91);
       }
     }
   }
@@ -162,7 +160,7 @@ async function handleSubmit() {
 
 .sidebar-list {
   list-style: none;
-  padding: 0 6px;
+  padding: 0;
   margin: 0;
   overflow-x: hidden;
   overflow-y: auto;
@@ -174,23 +172,16 @@ async function handleSubmit() {
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    color: #8d8d8d;
-    border-radius: 4px;
+    color: #ffffff;
     padding: 0 16px;
-    margin-bottom: 2px;
     transition: background-color 0.3s;
     user-select: none;
     &.active {
-      background-color: #dadada;
-      color: #333333;
-      box-shadow: 1px 1px 10px #f0f0f0;
+      background-color: #323232;
+      color: #00ca53;
       &:hover {
-        background-color: #dadada;
-        color: #333333;
+        color: #00ca53;
       }
-    }
-    &:hover {
-      background-color: #f6f6f6;
     }
   }
 }
