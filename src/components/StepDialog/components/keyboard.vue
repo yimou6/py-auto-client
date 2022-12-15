@@ -1,13 +1,10 @@
 <script setup lang="ts">
-/**
- * 键盘按键
- */
-import { ref, reactive, computed } from 'vue'
-import type { FormInstance } from 'element-plus'
+import { IKeyboard } from '../../../types/step'
+import {ref, reactive, onMounted, watch} from 'vue'
+import EFormItem from '../../EForm/form-item.vue'
+import EForm from '../../EForm/form.vue'
+import EInput from '../../EInput/input.vue'
 
-defineProps<{
-  value: { opera: string, presses: number }
-}>()
 
 // 来自：https://pyautogui.readthedocs.io/en/latest/keyboard.html
 const _keyboardKeys: string[] = ['!', '"', '#', '$', '%', '&', "'", '(',
@@ -33,55 +30,49 @@ const _keyboardKeys: string[] = ['!', '"', '#', '$', '%', '&', "'", '(',
   'up', 'volumedown', 'volumemute', 'volumeup', 'win', 'winleft', 'winright', 'yen',
   'command', 'option', 'optionleft', 'optionright']
 
-const keyboardKeys = computed(() => {
-  return _keyboardKeys.map(key => {
-    return {
-      label: key,
-      value: key
-    }
-  })
+const props = defineProps<{
+  value: IKeyboard
+}>()
+const emits = defineEmits(['update:value'])
+const formRef = ref()
+const formModel = reactive<IKeyboard>({
+  opera: '',
+  presses: '1'
+})
+const rules = reactive({})
+watch(
+    () => formModel,
+    (val) => {
+      emits('update:value', val)
+    },
+    { deep: true }
+)
+
+onMounted(() => {
+  formModel.opera = props.value.opera || ''
+  formModel.presses = props.value.presses || '1'
 })
 
-const formRef = ref<FormInstance>()
-const rules = reactive({
-  opera: [
-    { required: true, trigger: 'change', message: '请选择按键' }
-  ],
-  presses: [
-    { required: true, trigger: 'blur', message: '请输入按键次数' }
-  ]
-})
-
-const validate = (callback: Function) => {
-  formRef.value?.validate(valid => callback(valid))
-}
+const validate = () => formRef.value.validate()
 
 defineExpose({
   validate
 })
+
 </script>
 
 <template>
-  <el-form :model="value"
-           :rules="rules"
-           ref="formRef"
-           size="small"
-           label-width="85px">
-    <el-form-item label="按键" prop="opera">
-      <el-select-v2 v-model="value.opera"
-                    :options="keyboardKeys"
-                 filterable
-                 clearable
-                 placeholder="请选择"
-                 style="width: 100%">
-      </el-select-v2>
-    </el-form-item>
-    <el-form-item label="按键次数" prop="presses">
-      <el-input
-          v-model.number="value.presses"
-          :min="1"
-          :max="20"
-          style="width: 100%"/>
-    </el-form-item>
-  </el-form>
+  <e-form :model="formModel" :rules="rules" ref="formRef">
+    <div class="form-item-col2">
+
+      <e-form-item label="按键" prop="opera">
+        <e-input v-model="formModel.opera"></e-input>
+      </e-form-item>
+
+      <e-form-item label="按键次数" prop="presses">
+        <e-input v-model="formModel.presses" type="number"></e-input>
+      </e-form-item>
+
+    </div>
+  </e-form>
 </template>

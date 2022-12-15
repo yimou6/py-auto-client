@@ -18,11 +18,12 @@
                     :area="area"
                     @select-menu="handleSelectMenu"></MouseRightMenu>
 
-    <steps v-model:visible="visible"
-           :step="showStep"
-           :menu-key="menuKey"
-           :parent-ids="parentIds"
-           @refresh="getScript"></steps>
+    <StepDialog v-model:visible="visible"
+                :info="showStep"
+                :menu="menuKey"
+                :filename="nowScriptTitle"
+                :ids="parentIds"
+                @update-step="updateStep"></StepDialog>
   </div>
 </template>
 
@@ -34,8 +35,8 @@ import { nextTick, ref, watch } from 'vue'
 import MouseRightMenu from '../components/MouseRightMenu/MouseRightMenu.vue'
 import useStepStore from '../stores/step'
 import { storeToRefs } from 'pinia'
-import Steps from '../components/steps/steps.vue'
-import { IClickRightNode, Step, IArea, EMouseRightMenu } from '../../types'
+import { IClickRightNode, Step, IArea, EMouseRightMenu } from '../types'
+import StepDialog from '../components/StepDialog/index.vue'
 
 const stepStore = useStepStore()
 const { nowScriptTitle } = storeToRefs(stepStore)
@@ -48,10 +49,10 @@ const stepDir = ref('')
  */
 async function getScript() {
   if (nowScriptTitle.value) {
-    const result = await window.ipcRenderer.sendEvent('getSteps', { filename: nowScriptTitle.value })
-    if (result) {
-      stepData.value = result.data
-      stepDir.value = result.dir
+    const { code, data: { data: _data, dir } } = await window.ipcRenderer.sendEvent('step_get', { filename: nowScriptTitle.value })
+    if (code) {
+      stepData.value = _data
+      stepDir.value = dir
     }
   }
 }
@@ -66,11 +67,11 @@ const step = ref<Step>(new Step())
 const showStepMenu = ref(false)
 const showStep = ref<Step>(new Step())
 const area = ref<IArea>({ x: 0, y: 0 })
+
 async function delStep() {
-  await window.ipcRenderer.sendEvent('deleteStep', {
+  await window.ipcRenderer.sendEvent('step_del', {
     filename: nowScriptTitle.value,
-    step: JSON.parse(JSON.stringify(showStep.value)),
-    parentIds: JSON.parse(JSON.stringify(parentIds.value))
+    ids: JSON.parse(JSON.stringify(parentIds.value))
   })
   await getScript()
 }
@@ -107,6 +108,7 @@ function handleCreate() {
  *  打开右键菜单
  */
 function handleClickRight(val: IClickRightNode) {
+  console.log(val)
   showStepMenu.value = true
   showStep.value = val.nodes[val.nodes.length - 1]
   parentIds.value = val.nodes.map(item => item.id) || []
@@ -114,6 +116,10 @@ function handleClickRight(val: IClickRightNode) {
     area.value.x = val.position.x
     area.value.y = val.position.y
   })
+}
+
+const updateStep = (data: any) => {
+  stepData.value = data
 }
 </script>
 

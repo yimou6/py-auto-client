@@ -3,10 +3,10 @@
     <img src="../assets/tool.ico" alt="ico">
     <div>
       <span @click="handleMinimize">
-      <i class="iconfont icon-minus"></i>
+      <i class="iconfont icon-jianhao"></i>
     </span>
       <span @click="handleAppClose">
-      <i class="iconfont icon-close"></i>
+      <i class="iconfont icon-guanbi"></i>
     </span>
     </div>
   </div>

@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import pinyin from 'pinyin'
-import DialogView from '../components/DialogView.vue'
 import useStepStore from '../stores/step'
 import { storeToRefs } from 'pinia'
-import { IScript } from '../../types'
-import { ElMessage } from 'element-plus'
+import { IScript } from '../types'
+import CreateScript from '../components/CreateScript/index.vue'
+import { getScripts } from '../ipcRenderer'
 
 const stepStore = useStepStore()
 const { scripts, nowScriptTitle } = storeToRefs(stepStore)
@@ -14,17 +13,20 @@ const { scripts, nowScriptTitle } = storeToRefs(stepStore)
  * 获取脚本列表
  */
 async function getScriptList() {
-  const result: IScript[] = await window.ipcRenderer.sendEvent('getScriptList', {})
-  stepStore.changeScripts(result)
-  watchScripts(result)
+  const { code, data } = await getScripts()
+  if (code) {
+    stepStore.changeScripts(data)
+    watchScripts(data)
+  }
 }
 
 /**
  * 选中脚本，查看脚本步骤
  * @param filename
+ * @param name
  */
-async function handleActive(filename: string) {
-  stepStore.changeScriptTitle(filename)
+async function handleActive(filename: string, name: string) {
+  stepStore.changeScriptTitle(filename, name)
 }
 
 /**
@@ -32,14 +34,12 @@ async function handleActive(filename: string) {
  * @param value
  */
 function watchScripts(value: IScript[]) {
-  console.log(value)
   if (value.length > 0) {
-    console.log(nowScriptTitle)
     if (!value.some((item: IScript) => item.filename === nowScriptTitle.value)) {
-      handleActive(value[0].filename)
+      handleActive(value[0].filename, value[0].title)
     }
   } else {
-    handleActive('')
+    handleActive('', '')
   }
 }
 
@@ -54,26 +54,8 @@ watch(
 )
 
 const visible = ref<boolean>(false)
-const scriptTitle = ref<string>('')
 function handleCreate() {
   visible.value = true
-}
-function handleClose() {
-  scriptTitle.value = ''
-  visible.value = false
-}
-async function handleSubmit() {
-  const { code, msg } = await window.ipcRenderer.sendEvent('createScript', {
-    title: scriptTitle.value,
-    pinyin: pinyin(scriptTitle.value, { style: 'normal' }).join('')
-  })
-  if (code) {
-    handleClose()
-    ElMessage.success(msg || '创建成功。')
-    await getScriptList()
-  } else {
-    ElMessage.error(msg || '系统出错，创建失败。')
-  }
 }
 </script>
 
@@ -93,22 +75,14 @@ async function handleSubmit() {
       <ul class="sidebar-list">
         <li v-for="menu of scripts" :key="menu.filename"
             :class="{ 'active': nowScriptTitle === menu.filename }"
-            @click="handleActive(menu.filename)">
+            @click="handleActive(menu.filename, menu.title)">
           <span>{{ menu.title }}</span>
         </li>
       </ul>
     </div>
   </div>
 
-  <dialog-view :visible="visible" title="添加自动脚本">
-    <div class="form-item">
-      <el-input v-model="scriptTitle" name="scriptTitle" size="small" placeholder="脚本名称"></el-input>
-    </div>
-    <template #footer>
-      <el-button size="small" @click="handleClose">取消</el-button>
-      <el-button size="small" type="primary" @click="handleSubmit">确定</el-button>
-    </template>
-  </dialog-view>
+  <CreateScript v-model:visible="visible"></CreateScript>
 </template>
 
 <style scoped lang="scss">

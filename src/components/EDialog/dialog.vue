@@ -14,17 +14,19 @@ defineProps({
 
 <template>
   <teleport to="body">
-    <div class="dialog" v-if="visible">
-      <div class="dialog-warp">
-        <div class="dialog-title" v-if="title">{{ title }}</div>
-        <div class="dialog-content">
-          <slot/>
-        </div>
-        <div class="dialog-footer">
-          <slot name="footer"></slot>
+    <Transition name="fade" :duration="500">
+      <div class="dialog" v-if="visible">
+        <div class="dialog-warp">
+          <div class="dialog-title" v-if="title">{{ title }}</div>
+          <div class="dialog-content">
+            <slot/>
+          </div>
+          <div class="dialog-footer">
+            <slot name="footer"></slot>
+          </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </teleport>
 </template>
 
@@ -45,6 +47,7 @@ defineProps({
     background-color: #ffffff;
     border-radius: 2px;
     margin-top: 20px;
+    max-width: 420px;
 
     .dialog-title {
       font-size: 16px;
@@ -69,5 +72,24 @@ defineProps({
       padding-right: 15px;
     }
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active .dialog-warp,
+.fade-leave-active .dialog-warp {
+  transition: all 0.3s ease-out;
+}
+.fade-enter-from .dialog-warp,
+.fade-leave-to .dialog-warp {
+  transform: translateY(-30px);
+  opacity: 0;
 }
 </style>

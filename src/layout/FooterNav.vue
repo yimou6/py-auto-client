@@ -1,63 +1,75 @@
 <template>
   <div class="footer-nav">
     <div @click="handleExplorer" title="打开文件夹">
-      <i class="iconfont icon-file-open"></i>
+      <i class="iconfont icon-wenjianjia"></i>
     </div>
-    <div @click="handleDelScript" title="删除脚本">
-      <i class="iconfont icon-delete"></i>
+    <div @click="handleEdit" title="修改">
+      <i class="iconfont icon-bianji"></i>
+    </div>
+    <div @click="handleDelScript" title="删除">
+      <i class="iconfont icon-shanchu"></i>
     </div>
     <div @click="handleRun" title="运行">
-      <i class="iconfont icon-play"></i>
+      <i class="iconfont icon-bofang"></i>
+    </div>
+    <div title="帮助">
+      <i class="iconfont icon-bangzhu"></i>
     </div>
   </div>
+  <CreateScript v-model:visible="visible" title="修改" :script-value="nowScriptName"></CreateScript>
+  <EDialog v-model:visible="delVisible" title="提示">
+    <p>{{ `是否确认删除脚本：${scripts[delIndex].title}` }}</p>
+    <template #footer>
+      <e-button @click="delVisible = false">关闭</e-button>
+      <e-button type="primary" @click="handleSubmit">确认删除</e-button>
+    </template>
+  </EDialog>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import useStepStore from '../stores/step'
-import { ElMessageBox } from 'element-plus'
+import { ref } from 'vue'
+import CreateScript from '../components/CreateScript/index.vue'
+import EDialog from '../components/EDialog/dialog.vue'
+import EButton from '../components/EButton/button.vue'
+import {deleteScript, openExplorer, runCmd} from '../ipcRenderer'
 
 const stepStore = useStepStore()
-const { nowScriptTitle, scripts } = storeToRefs(stepStore)
+const { nowScriptTitle, scripts, nowScriptName } = storeToRefs(stepStore)
+const visible = ref(false)
+const delVisible = ref(false)
+const delIndex = ref(-1)
 
 /**
  * 打开脚本所在文件夹
  */
-function handleExplorer() {
-  window.ipcRenderer.sendEvent('openExplorer', { filename: nowScriptTitle.value })
-}
+const handleExplorer = () => openExplorer(nowScriptTitle.value)
 
 /**
  * 删除脚本
  */
-async function handleDelScript() {
+const handleDelScript = async () => {
+  delVisible.value = true
   if (!nowScriptTitle.value) return
-  const index = scripts.value.findIndex(script => script.filename === nowScriptTitle.value)
-  ElMessageBox.confirm(
-      `是否确认删除脚本：${scripts.value[index].title}`,
-      '提示',
-      {
-        confirmButtonText: '确认删除',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }
-  ).then(() => {
-    window.ipcRenderer.sendEvent('deleteScript', {
-      filename: nowScriptTitle.value
-    })
-    stepStore.$patch((state) => {
-      state.scripts.splice(index, 1)
-    })
-  }).catch(() => ({}))
+  delIndex.value = scripts.value.findIndex(script => script.filename === nowScriptTitle.value)
+}
+
+const handleSubmit = () => {
+  deleteScript(nowScriptTitle.value)
+  stepStore.$patch((state) => {
+    state.scripts.splice(delIndex.value, 1)
+  })
+  delVisible.value = false
 }
 
 /**
  * 运行脚本
  */
-function handleRun() {
-  window.ipcRenderer.sendEvent('runCmd', {
-    cmd: nowScriptTitle.value
-  })
+const handleRun = () => runCmd(nowScriptTitle.value)
+
+const handleEdit = async () => {
+  visible.value = true
 }
 </script>
 

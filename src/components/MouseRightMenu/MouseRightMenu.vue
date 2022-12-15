@@ -3,7 +3,7 @@
 import type { PropType } from 'vue'
 import { computed, ref } from 'vue'
 import { default as vClickOutside } from '../../directives/click-outside'
-import { IArea, Step } from '../../../types'
+import { IArea, Step } from '../../types'
 
 const props = defineProps({
   area: {
@@ -38,23 +38,30 @@ const handleClick = (e: PointerEvent) => {
 }
 
 const menuList = computed(() => {
-  let other = []
+  let other = ['修改步骤', '删除步骤']
+  let base = ['添加上一步', '添加下一步']
   if (['判断图片', '判断时间', '循环'].includes(props.stepInfo?.type)) {
-    console.log('*', props.stepInfo)
-    if (validArr(props.stepInfo.success)) {
-      other.push('判断成功步骤')
+    // console.log('*', props.stepInfo)
+    const hasSuccess = props.stepInfo.children
+        ? props.stepInfo.children.some(item => item.childKey === 'success')
+        : false
+    const hasFail = props.stepInfo.children
+        ? props.stepInfo.children.some(item => item.childKey === 'fail')
+        : false
+    const hasFinally = props.stepInfo.children
+        ? props.stepInfo.children.some(item => item.childKey === 'finally')
+        : false
+    if (!hasSuccess) {
+      base = base.concat(['判断成功步骤'])
     }
-    if (props.stepInfo?.type === '判断图片' || props.stepInfo?.type === '判断时间') {
-      if (validArr(props.stepInfo.fail)) {
-        other.push('判断失败步骤')
-      }
-      if (validArr(props.stepInfo.last)) {
-        other.push('判断结束步骤')
-      }
+    if (!hasFail) {
+      base = base.concat(['判断失败步骤'])
     }
-    return ['添加上一步', '添加下一步'].concat(other, ['修改步骤', '删除步骤'])
+    if (!hasFinally) {
+      base = base.concat(['判断结束步骤'])
+    }
   }
-  return ['添加上一步', '添加下一步', '修改步骤', '删除步骤']
+  return base.concat(other)
 })
 
 function validArr(arr: Step[] | undefined) {

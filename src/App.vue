@@ -59,12 +59,13 @@ html, body {
   }
 }
 
-.form-item {
-  margin-bottom: 12px;
-  label {
-    font-size: 12px;
-    color: #555555;
-    padding-right: 6px;
-  }
+// input type=number 去掉上下箭头
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  appearance: none;
 }
+input[type='number'] {
+  appearance: textfield;
+}
+
 </style>

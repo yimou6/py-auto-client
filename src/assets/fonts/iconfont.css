@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3755765 */
-  src: url('iconfont.woff2?t=1670402279291') format('woff2'),
-       url('iconfont.woff?t=1670402279291') format('woff'),
-       url('iconfont.ttf?t=1670402279291') format('truetype');
+  src: url('iconfont.woff2?t=1671026453641') format('woff2'),
+       url('iconfont.woff?t=1671026453641') format('woff'),
+       url('iconfont.ttf?t=1671026453641') format('truetype');
 }
 
 .iconfont {
@@ -13,27 +13,39 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-play:before {
-  content: "\ea6e";
+.icon-bianji:before {
+  content: "\eb49";
 }
 
-.icon-plus:before {
-  content: "\e659";
+.icon-wenjianjia:before {
+  content: "\eb4f";
 }
 
-.icon-close:before {
-  content: "\e669";
+.icon-tupian:before {
+  content: "\eb50";
 }
 
-.icon-minus:before {
-  content: "\e67a";
+.icon-bofang:before {
+  content: "\eb5e";
 }
 
-.icon-delete:before {
-  content: "\e699";
+.icon-bangzhu:before {
+  content: "\eb72";
 }
 
-.icon-file-open:before {
-  content: "\e670";
+.icon-guanbi:before {
+  content: "\eb76";
+}
+
+.icon-jiahao:before {
+  content: "\eb78";
+}
+
+.icon-jianhao:before {
+  content: "\eb79";
+}
+
+.icon-shanchu:before {
+  content: "\eb83";
 }
 
