@@ -2,6 +2,9 @@
 
 > 仅用于学习交流
 
+#### 下载
+[下载windows应用程序](https://github.com/yimou6/py-auto-client/releases/download/1.0.0/py-auto-client._1.0.0.exe)
+
 #### 使用
 ```
 // install
