@@ -21,6 +21,19 @@ export function selectImage() {
     })
 }
 
+export const step_image = () => {
+    return dialog.showOpenDialogSync({
+        title: '选择图片',
+        filters: [
+            {
+                name: 'Images',
+                extensions: ['jpg', 'png']
+            }
+        ],
+        properties: ['openFile']
+    })
+}
+
 export function runCmd({ cmd }) {
     exec('start.bat', {
         cwd: join(app.getPath('userData'), 'step', cmd)

@@ -45,7 +45,7 @@ async function createWindow() {
   // 取消顶部菜单栏
   Menu.setApplicationMenu(null)
   win = new BrowserWindow({
-    title: 'Main window',
+    title: 'Auto Tool',
     icon: join(process.env.PUBLIC, 'favicon.ico'),
     width: 800,
     height: 600,

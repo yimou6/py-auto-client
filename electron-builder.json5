@@ -2,7 +2,7 @@
  * @see https://www.electron.build/configuration/configuration
  */
 {
-  "appId": "com.electron.yimou6",
+  "appId": "com.example.app",
   "asar": true,
   "directories": {
     "output": "release/${version}"
@@ -26,7 +26,7 @@
         ]
       }
     ],
-    "icon": "public/tool.ico",
+    "icon": "public/favicon.ico",
     "artifactName": "Python自动化工具_${version}.${ext}"
   },
   "nsis": {

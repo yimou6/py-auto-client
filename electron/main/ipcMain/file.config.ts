@@ -9,8 +9,6 @@ start python start.py
 
 export const pyStr =
 `
-
-
 import sys
 import pyautogui
 import datetime
@@ -42,7 +40,7 @@ def getImagePosition(image):
 
 
 def errorStop(error_stop):
-    if error_stop == 1:
+    if error_stop == 'stop':
         loggerText('失败')
         sys.exit(1)
 
@@ -53,8 +51,8 @@ def clickImage(image, error_stop, clicks=1, button='left', x=0, y=0):
     if position is not None:
         loggerText('成功: position:{};x:{};y:{}'.format(position, x, y))
         pyautogui.click(
-            x=position.x + int(x),
-            y=position.y + int(y),
+            x=position.x + x,
+            y=position.y + y,
             button=button,
             clicks=clicks,
             interval=0.3
@@ -90,7 +88,7 @@ def judgeImageView(image, error_stop, success, fail, last, max_time=2):
 
 # 判断时间
 def judgeDate(day_type, day, success, fail, last):
-    if day_type == 1:
+    if day_type == '2':
         if datetime.datetime.now().strftime('%d') == day:
             if success is not None:
                 for success_task in success:
@@ -102,7 +100,7 @@ def judgeDate(day_type, day, success, fail, last):
         if last is not None:
             for last_task in last:
                 run(last_task)
-    if day_type == 0:
+    if day_type == '1':
         if datetime.datetime.now().weekday() == day:
             if success is not None:
                 for success_task in success:
@@ -142,7 +140,7 @@ def clickPosition(x=0, y=0, button='left', clicks=1):
 # 等待
 def wait(sleep):
     if int(sleep) > 0:
-        time.sleep(sleep)
+        time.sleep(int(sleep))
         loggerText('成功')
 
 
@@ -159,23 +157,24 @@ def loopTask(frequency, success):
 
 # read step info
 def run(step):
-    name = step.get('name')
     step_type = step.get('type')
     next_wait = step.get('nextWait')
+
     options = step.get('options')
+
     if step_type == '快捷键':
         hotkey = options.get('hotkey')
-        loggerText('[{} - {}]: hotkey={}'.format(step_type, name, hotkey))
+        loggerText('[{}]: hotkey={}'.format(step_type, hotkey))
         keyboardHotkey(hotkey=hotkey)
     elif step_type == '点击图片':
-        opera = options.get('opera')
-        x = options.get('x')
-        y = options.get('y')
         button = options.get('button')
         clicks = options.get('clicks')
-        error_stop = options.get('errorStop')
-        loggerText('[{} - {}]: opera={}, x={}, y={}, button={}, clicks={}, error_stop={}'
-                   .format(step_type, name, opera, x, y, button, clicks, error_stop))
+        x = int(options.get('x'))
+        y = int(options.get('y'))
+        error_stop = options.get('error')
+        opera = options.get('opera')
+        loggerText('[{}]: opera={}, x={}, y={}, button={}, clicks={}, error_stop={}'
+                   .format(step_type, opera, x, y, button, clicks, error_stop))
         if clicks == 'single':
             clicks = 1
         else:
@@ -183,58 +182,87 @@ def run(step):
         clickImage(image=opera, error_stop=error_stop, clicks=clicks, button=button, x=x, y=y)
     elif step_type == '判断图片':
         opera = options.get('opera')
-        wait_time = options.get('waitTime')
-        error_stop = options.get('errorStop')
-        success = step.get('success')
-        fail = step.get('fail')
-        last = step.get('last')
-        loggerText('[{} - {}]: opera={}, wait_time={}, error_stop={}'
-                   .format(step_type, name, opera, wait_time, error_stop))
+        wait_time = int(options.get('waitTime'))
+        error_stop = options.get('error')
+
+        children = step.get('children')
+        success = []
+        fail = []
+        last = []
+        if type(children) == list:
+            for _children in children:
+                if _children.get('childKey') == 'success':
+                    success.append(_children)
+                elif _children.get('childKey') == 'fail':
+                    fail.append(_children)
+                elif _children.get('childKey') == 'finally':
+                    last.append(_children)
+
+        loggerText('[{}]: opera={}, wait_time={}, error_stop={}'
+                   .format(step_type, opera, wait_time, error_stop))
+
         judgeImageView(image=opera, error_stop=error_stop, max_time=wait_time, success=success, fail=fail, last=last)
     elif step_type == '键盘按键':
         opera = options.get('opera')
-        presses = options.get('presses')
-        loggerText('[{} - {}]: opera={}, presses={}'
-                   .format(step_type, name, opera, presses))
+        presses = int(options.get('presses'))
+        loggerText('[{}]: opera={}, presses={}'
+                   .format(step_type, opera, presses))
         keyboardPress(key=opera, presses=presses)
     elif step_type == '输入字符':
         opera = options.get('opera')
-        loggerText('[{} - {}]: opera={}'
-                   .format(step_type, name, opera))
+        loggerText('[{}]: opera={}'
+                   .format(step_type, opera))
         writeCharacter(character=opera)
     elif step_type == '单击坐标':
-        x = options.get('x')
-        y = options.get('y')
+        x = int(options.get('x'))
+        y = int(options.get('y'))
         button = options.get('button')
         clicks = options.get('clicks')
-        loggerText('[{} - {}]: x={}, y={}, button={} clicks={}'
-                   .format(step_type, name, x, y, button, clicks))
+        loggerText('[{}]: x={}, y={}, button={} clicks={}'
+                   .format(step_type, x, y, button, clicks))
         if clicks == 'single':
             clicks = 1
         else:
             clicks = 2
         clickPosition(x=x, y=y, button=button, clicks=clicks)
     elif step_type == '等待':
-        wait_time = options.get('waitTime')
-        loggerText('[{} - {}]: waitTime={}'
-                   .format(step_type, name, wait_time))
+        wait_time = int(options.get('waitTime'))
+        loggerText('[{}]: waitTime={}'
+                   .format(step_type, wait_time))
         wait(sleep=wait_time)
     elif step_type == '循环':
-        presses = options.get('presses')
-        success = step.get('success')
-        loggerText('[{} - {}]: presses={}'
-                   .format(step_type, name, presses))
+        presses = int(options.get('presses'))
+
+        children = step.get('children')
+        success = []
+        if type(children) == list:
+            for _children in children:
+                if _children.get('childKey') == 'success':
+                    success.append(_children)
+
+        loggerText('[{}]: presses={}'
+                   .format(step_type, presses))
         if success:
             loopTask(frequency=presses, success=success)
-
     elif step_type == '判断时间':
         presses = options.get('presses')
         day = options.get('day')
-        success = step.get('success')
-        fail = step.get('fail')
-        last = step.get('last')
-        loggerText('[{} - {}]: presses={}, day={}'
-                   .format(step_type, name, presses, day))
+
+        children = step.get('children')
+        success = []
+        fail = []
+        last = []
+        if type(children) == list:
+            for _children in children:
+                if _children.get('childKey') == 'success':
+                    success.append(_children)
+                elif _children.get('childKey') == 'fail':
+                    fail.append(_children)
+                elif _children.get('childKey') == 'finally':
+                    last.append(_children)
+
+        loggerText('[{}]: presses={}, day={}'
+                   .format(step_type, presses, day))
         judgeDate(day_type=presses, day=day, success=success, fail=fail, last=last)
     wait(next_wait)
 
@@ -248,6 +276,5 @@ def readStep():
 
 
 readStep()
-
 
 `

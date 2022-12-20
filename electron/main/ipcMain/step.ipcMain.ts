@@ -1,63 +1,53 @@
-import {existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, writeFileSync} from 'fs'
+import {
+    existsSync, mkdirSync, readdirSync,
+    readFileSync, rmdirSync, writeFileSync,
+    unlinkSync
+} from 'fs'
 import { join } from 'path'
 import { existsMkdir, copyImage, rmDir } from '../utils'
-import { EMouseRightMenu } from '../utils/types'
 import { dataDir } from '../utils'
 import { batStr, pyStr } from './file.config'
 
-
 /**
- * 获取所有脚本列表
+ * 返回字段格式
+ *  code:
+ *      0：失败
+ *      1：成功
+ *  msg：描述信息
+ *  data?：返回数据
  */
-export function getScriptList(): any[] {
-    // 如果路径不存在则创建
-    existsMkdir(dataDir)
 
-    // 获取文件夹列表
-    const dirList = readdirSync(dataDir)
-    const scripts = dirList.filter((dir: string) => dir.includes('_script'))
-    let list = []
-    if (scripts.length === 0) return list
 
-    // 读取配置文件config.json
-    scripts.forEach((item: string) => {
-        const fileDir = join(dataDir, item, 'config.json')
-        if (existsSync(fileDir)) {
-            let doc = readFileSync(fileDir)
-            let scriptConfig
-            try {
-                scriptConfig = JSON.parse(doc.toString('utf-8'))
-                list.push(scriptConfig)
-            } catch (e) {
-                console.error(e)
-            }
-        }
-    })
-    return list
+function replyData(code: number, msg: string, data?: any) {
+    return data ? { code, msg, data } : { code, msg }
 }
 
 /**
- * 创建脚本
+ * @desc 创建脚本文件夹以及初始化基础信息
+ * @param title {string}
  */
-export function createScript({ title, pinyin }) {
-    const dir = join(dataDir, pinyin + '_script')
+export function script_create({ title }) {
+    const time = new Date().toLocaleString()
+    const filename = `${Date.now()}`
+    // 使用【时间戳】做目录
+    const dir = join(dataDir, `${filename}`)
     // 已有脚本目录则不创建
-    if (existsSync(dir)) return { code: 0, msg: '创建失败，已存在该脚本！' }
+    if (existsSync(dir)) return replyData(0, '已存在该项')
 
+    const config = {
+        title: title,
+        filename,
+        createdAt: time,
+        updatedAt: time
+    }
     try {
         // 新建脚本文件夹
         mkdirSync(dir)
 
         // 新建配置文件
-        const time = new Date().toLocaleString()
         writeFileSync(
             join(dir, 'config.json'),
-            JSON.stringify({
-                title: title,
-                filename: pinyin + '_script',
-                createdAt: time,
-                updatedAt: time
-            })
+            JSON.stringify(config)
         )
 
         // 新建脚本步骤配置文件 step.json
@@ -79,231 +69,243 @@ export function createScript({ title, pinyin }) {
         )
     } catch (e) {
         // 如果创建失败则删除全部已创建的文件和文件夹
-        deleteScript({
-            filename: pinyin + '_script'
+        script_del({
+            filename
         })
-        return {
-            code: 0,
-            msg: e.toString()
-        }
+        return replyData(0, e.toString())
     }
-    return {
-        code: 1,
-        msg: '创建成功！'
-    }
+    return replyData(1, '创建成功', { filename })
 }
 
 /**
- * 删除脚本
+ * @desc 删除脚本文件夹以及内容
+ * @param filename {string}
  */
-export function deleteScript({ filename }) {
+export const script_del = ({ filename }) => {
     rmDir(join(dataDir, filename))
     rmdirSync(join(dataDir, filename))
 }
 
 /**
- * 获取步骤
- * @param filename
+ * @desc 修改脚本名称
+ * @param title {string}
+ * @param filename {string}
  */
-export function getSteps({ filename }) {
+export function script_modify({ title, filename }) {
+    const dir = join(dataDir, filename)
+    const time = new Date().toLocaleString()
+    let doc
+
+    // 读取原配置文件 config.json
+    try {
+        doc = readFileSync(join(dir, 'config.json'))
+        doc = JSON.parse(doc.toString())
+    } catch (e) {
+        return replyData(0, e.toString())
+    }
+
+    // 修改配置文件 config.json
+    doc['title'] = title
+    doc['updatedAt'] = time
+
+    // 保存
+    writeFileSync(join(dir, 'config.json'), JSON.stringify(doc))
+    return replyData(1, '修改成功')
+}
+
+export const step_get = ({ filename }) => {
     try {
         const doc = readFileSync(join(dataDir, filename, 'step.json'))
-        return {
+        return replyData(1, '查询成功', {
             data: JSON.parse(doc.toString('utf-8')),
             dir: join(dataDir, filename)
-        }
+        })
     } catch (e) {
-        console.error(e)
-        return null
+        return replyData(0, e.toString())
     }
 }
 
-/**
- * 修改步骤
- */
-export function modifyStep({ filename, step, parentIds }) {
-    const result = getSteps({
-        filename: filename
-    })
-    if (result) {
-        console.log(step)
-        updateStep(result.data, parentIds, step)
+export const step_add = ({ ids, filename, type, info }) => {
+    // console.log('step add:', { ids, filename, type, info })
+    // console.log(JSON.stringify(info))
+    const { code, msg, data } = step_get({ filename })
+    if (code === 0) {
+        return replyData(0, `数据获取失败:${msg}`)
+    }
+
+    const stepInfo = { ...info }
+    // 添加ID字段
+    stepInfo.id = `${Date.now()}`
+    // 处理图片
+    const needCopyImage = ['点击图片', '判断图片']
+    if (needCopyImage.includes(stepInfo.type)) {
+        stepInfo.options.opera = copyImage(
+            stepInfo.options.opera,
+            join(dataDir, filename, 'images')
+        )
+    }
+
+    const { data: _data } = data
+    if (type) {
+        updateStepList(_data, ids, type, stepInfo, '添加')
+    } else {
+        // type 无值、空字符串 - 直接添加下一步
+        _data.push(stepInfo)
+    }
+    try {
+        writeFileSync(
+            join(dataDir, filename, 'step.json'),
+            JSON.stringify(_data)
+        )
+        return replyData(1, '操作成功', _data)
+    } catch (e) {
+        return replyData(0, `操作失败:${e.toString()}`)
+    }
+}
+
+export const step_del = ({ filename, ids }) => {
+    const { code, msg, data } = step_get({ filename })
+    if (code === 0) {
+        return replyData(0, `数据获取失败:${msg}`)
+    }
+    if (ids.length > 0) {
+        const { data: _data } = data
+        updateStepList(_data, ids, '', {}, '删除')
         try {
             writeFileSync(
                 join(dataDir, filename, 'step.json'),
-                JSON.stringify(result.data)
+                JSON.stringify(_data)
             )
-            return result.data
+            return replyData(1, '操作成功', _data)
         } catch (e) {
-            console.error(e)
-            return null
-        }
-    }
-    return null
-}
-
-/**
- * 删除步骤
- * @param opt
- */
-export function deleteStep({ filename, step, parentIds }) {
-    const result = getSteps({
-        filename: filename
-    })
-    if (result) {
-        delStep(result.data, parentIds, step)
-        try {
-            writeFileSync(
-                join(dataDir, filename, 'step.json'),
-                JSON.stringify(result.data)
-            )
-            return result.data
-        } catch (e) {
-            console.error(e)
-            return null
-        }
-    }
-    return null
-}
-
-
-export function ipcAddStep(args) {
-    const { step, parentIds, menuKey, scriptName } = args
-    // console.log('新增脚本：')
-    // console.log('step：', step)
-    // console.log('parentIds：', parentIds)
-    // console.log('menuKey：', menuKey)
-    // console.log('scriptName：', scriptName)
-    const result = getSteps({ filename: scriptName })
-    if (result) {
-        const needCopyImage = ['点击图片', '判断图片']
-        if (needCopyImage.includes(step.type)) {
-            step.options.opera = copyImage(
-                step.options.opera,
-                join(dataDir, scriptName, 'images')
-            )
-        }
-        step.id = `${Date.now()}`
-        if (parentIds.length > 0) {
-            createNextStep(result.data, step, menuKey, parentIds)
-        } else {
-            result.data.push(step)
-        }
-
-        try {
-            writeFileSync(
-                join(dataDir, scriptName, 'step.json'),
-                JSON.stringify(result.data)
-            )
-            return result.data
-        } catch (e) {
-            console.error(e)
-            return null
-        }
-    }
-    return null
-}
-
-
-function delStep(steps: any[], parentIds: string[], step: any) {
-    writeStepInfo(parentIds, steps, step, '', (data, index) => {
-        data.splice(index, 1)
-    })
-}
-
-
-function updateStep(data: any[], parentIds: string[], step: any) {
-    writeStepInfo(parentIds, data, step, '', updatedStep)
-}
-
-function updatedStep(data, index, step) {
-    console.log(data[index])
-    for (const key in step) {
-        if (!['success', 'fail', 'last'].includes(key)) {
-            data[index][key] = step[key]
-        }
-    }
-    console.log('success')
-}
-
-
-/**
- * 处理 创建、修改 步骤的逻辑
- * @param data
- * @param step
- * @param opera
- * @param parentIds
- */
-function createNextStep(data: any[], step: any, opera: string, parentIds: string[]) {
-    if (opera === EMouseRightMenu.next) {
-        if (parentIds.length === 0) {
-            data.push(step)
-        } else {
-            writeStepInfo(parentIds, data, step, opera, addStep)
-        }
-    } else if (opera === EMouseRightMenu.previous) {
-        if (parentIds.length === 0) {
-            data.unshift(step)
-        } else {
-            writeStepInfo(parentIds, data, step, opera, addStep)
+            return replyData(0, `操作失败:${e.toString()}`)
         }
     } else {
-        writeStepInfo(parentIds, data, step, opera, addChild)
+        return replyData(0, '参数有误')
     }
 }
 
-function writeStepInfo(parentIds, initData, val, opera, callback) {
-    let index = -1
-    let data = {}
-    parentIds.forEach((id, i) => {
-        if (i === 0) {
-            index = findIndex(initData, id)
-            if (i === parentIds.length -1) {
-                callback(initData, index, val, opera)
-            } else {
-                data = initData[index]
+export const step_modify = ({ filename, ids, info }) => {
+    const { code, msg, data } = step_get({ filename })
+    if (code === 0) {
+        return replyData(0, `数据获取失败:${msg}`)
+    }
+
+    const stepInfo = { ...info }
+    // 处理图片
+    const needCopyImage = ['点击图片', '判断图片']
+    if (needCopyImage.includes(stepInfo.type)) {
+        if (stepInfo.options.old_opera !== stepInfo.options.opera) {
+            // 删除原图片，再移动现图片到对应位置
+            if (existsSync(stepInfo.options.old_opera)) {
+                unlinkSync(stepInfo.options.old_opera)
             }
-        } else {
-            let childKey = ''
-            let successIndex = findIndex(data['success'], id)
-            if (successIndex === -1) {
-                let failIndex = findIndex(data['fail'], id)
-                if (failIndex === -1) {
-                    let finallyIndex = findIndex(data['last'], id)
-                    if (finallyIndex === -1) {
-                        // todo error
-                    } else {
-                        index = finallyIndex
-                        childKey = 'last'
+
+            stepInfo.options.opera = copyImage(
+                stepInfo.options.opera,
+                join(dataDir, filename, 'images')
+            )
+        }
+        delete stepInfo.options.old_opera
+    }
+
+    const { data: _data } = data
+    updateStepList(_data, ids, '', info, '修改')
+    try {
+        writeFileSync(
+            join(dataDir, filename, 'step.json'),
+            JSON.stringify(_data)
+        )
+        return replyData(1, '操作成功', _data)
+    } catch (e) {
+        return replyData(0, `操作失败:${e.toString()}`)
+    }
+}
+
+const updateStepList = (stepList, ids, type, step, opera) => {
+    for (let i = 0; i < stepList.length; i++) {
+        if (stepList[i].id === ids[0]) {
+            if (ids.length === 1) {
+                // 最后
+                if (opera === '添加') {
+                    addStepItem(stepList, stepList[i], step, type, i)
+                }
+                if (opera === '删除') {
+                    stepList.splice(i, 1)
+                    // 如果该步骤应用了图片则删除该图片
+                    const needCopyImage = ['点击图片', '判断图片']
+                    if (needCopyImage.includes(stepList[i].type)) {
+                        if (existsSync(stepList[i].options.opera)) {
+                            unlinkSync(stepList[i].options.opera)
+                        }
                     }
+                }
+                if (opera === '修改') {
+                    Object.keys(step).forEach(key => {
+                        stepList[i][key] = step[key]
+                    })
+                }
+                break
+            } else {
+                ids.splice(0, 1)
+                if (ids.length > 0 && stepList[i].children) {
+                    updateStepList(stepList[i].children, ids, type, step, opera)
+                }
+            }
+        }
+    }
+}
+
+const addStepItem = (stepList, findStep, step, type, index) => {
+    if (type === '添加上一步') {
+        stepList.splice(index, 0, step)
+    } else if (type === '添加下一步') {
+        stepList.splice(index + 1, 0, step)
+    } else {
+        if (findStep.children) {
+            if (type === '判断成功步骤') {
+                findStep.children.unshift(step)
+            } else if (type === '判断失败步骤') {
+                if (findStep.children[0].childKey === 'success') {
+                    findStep.children.push(step)
                 } else {
-                    index = failIndex
-                    childKey = 'fail'
+                    findStep.children.unshift(step)
                 }
             } else {
-                index = successIndex
-                childKey = 'success'
+                findStep.children.push(step)
             }
-            if (i === parentIds.length -1) {
-                callback(data[childKey], index, val, opera)
-            } else {
-                data = data[childKey][index]
+        } else {
+            findStep.children = []
+            findStep.children.push(step)
+        }
+    }
+}
+
+/**
+ * 获取所有脚本列表
+ */
+export function script_get() {
+    // 如果路径不存在则创建
+    existsMkdir(dataDir)
+
+    // 获取文件夹列表
+    const dirList = readdirSync(dataDir)
+    let list = []
+    if (dirList.length === 0) return list
+
+    // 读取配置文件config.json
+    dirList.forEach((item: string) => {
+        const fileDir = join(dataDir, item, 'config.json')
+        if (existsSync(fileDir)) {
+            let doc = readFileSync(fileDir)
+            let scriptConfig
+            try {
+                scriptConfig = JSON.parse(doc.toString('utf-8'))
+                list.push(scriptConfig)
+            } catch (e) {
+                replyData(0, e.toString())
             }
         }
     })
-}
-
-function findIndex(data: any[], id: string) {
-    return data ? data.findIndex(item => item.id === id) : -1
-}
-
-function addStep(data, index, step, opera) {
-    data.splice(opera === EMouseRightMenu.next ? index + 1 : index, 0, step)
-}
-
-function addChild(data, index, step, opera) {
-    const childKey = opera === EMouseRightMenu.success
-        ? 'success' : opera === EMouseRightMenu.fail
-            ? 'fail' : 'last'
-    data[index][childKey] = [step]
+    return replyData(1, '查询成功', list)
 }

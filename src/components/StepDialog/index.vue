@@ -49,17 +49,17 @@ import writeChar from './components/writeChar.vue'
 import { reactive, ref, watch, computed, toRaw  } from 'vue'
 import { IStep } from '../../types/step'
 
-
-const types: Record<string, string> = {
-  '点击图片': 'clickImage',
-  '判断图片': 'judgeImage',
-  '键盘按键': 'keyboard',
-  '输入字符': 'writeChar',
-  '快捷键': 'keyboardHot',
-  '单击坐标': 'clickPosition',
-  '等待': 'waitTime',
-  '循环': 'loopStep',
-  '判断时间': 'judgeDate'
+// @ts-ignore
+const types = {
+  '点击图片': clickImage,
+  '判断图片': judgeImage,
+  '键盘按键': keyboard,
+  '输入字符': writeChar,
+  '快捷键': keyboardHot,
+  '单击坐标': clickPosition,
+  '等待': waitTime,
+  '循环': loopStep,
+  '判断时间': judgeDate
 }
 
 const validNextWait = (value: string, callback: any) => {
@@ -145,24 +145,25 @@ const handleClose = () => {
   emits('update:visible', false)
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  console.log(formModel)
   if (formRef.value.validate() && childRef.value.validate()) {
     if (title.value === '修改') {
-      stepModify()
+      await stepModify()
     } else {
-      stepAdd()
+      await stepAdd()
     }
+    handleClose()
   }
 }
 
-const stepModify = async() => {
+const stepModify = async () => {
   const { code, msg, data } = await window.ipcRenderer.sendEvent('step_modify', {
     filename: props.filename,
     ids: toRaw(props.ids) || [],
     info: toRaw(formModel)
   })
   if (code) {
-    handleClose()
     emits('update-step', data)
   } else {
     console.log(msg)
@@ -182,7 +183,6 @@ const stepAdd = async () => {
     filename: props.filename
   })
   if (code) {
-    handleClose()
     emits('update-step', data)
   } else {
     console.log(msg)

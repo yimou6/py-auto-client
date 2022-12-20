@@ -9,7 +9,7 @@ import {
   IKeyboardHot,
   IClickPosition, IWaitTime, ILoop, IJudgeDate, StepInfo
 } from '../../types/step'
-import {computed, onMounted, reactive} from "vue";
+import { onMounted, reactive, watch } from 'vue'
 
 const props = defineProps<{
   data: IStep,
@@ -28,7 +28,15 @@ const stepInfo = reactive<StepInfo>({
   otherInfo: []
 })
 
-onMounted(() => {
+watch(
+    () => props.data,
+    () => {
+      formatInfo()
+    }
+)
+
+onMounted(() => formatInfo())
+const formatInfo = () => {
   const { data } = props
   const type = data.type
   let image = ''
@@ -97,8 +105,7 @@ onMounted(() => {
   stepInfo.image = image
   stepInfo.baseInfo = baseInfo
   stepInfo.otherInfo = otherInfo
-
-})
+}
 
 const setButton = (button: string) => {
   return `<div class="info-default">鼠标 <strong>${button === 'left' ? '左' : '右'}</strong> 键</div>`

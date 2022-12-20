@@ -1,6 +1,6 @@
 import './appLoading'
 import { contextBridge, ipcRenderer } from 'electron'
-import { ISendEvent } from '../../types'
+import { ISendEvent } from '../../src/types'
 
 const _ipcRenderer: ISendEvent = {
   sendEvent: (name, data) => ipcRenderer.invoke(name, data)
