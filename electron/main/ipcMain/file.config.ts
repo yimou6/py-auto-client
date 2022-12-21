@@ -134,13 +134,13 @@ def keyboardHotkey(hotkey):
 
 # 单击坐标
 def clickPosition(x=0, y=0, button='left', clicks=1):
-    pyautogui.click(x=int(x), y=int(y), button=button, clicks=clicks)
+    pyautogui.click(x=float(x), y=float(y), button=button, clicks=clicks)
 
 
 # 等待
 def wait(sleep):
-    if int(sleep) > 0:
-        time.sleep(int(sleep))
+    if float(sleep) > 0:
+        time.sleep(float(sleep))
         loggerText('成功')
 
 
@@ -169,8 +169,8 @@ def run(step):
     elif step_type == '点击图片':
         button = options.get('button')
         clicks = options.get('clicks')
-        x = int(options.get('x'))
-        y = int(options.get('y'))
+        x = float(options.get('x'))
+        y = float(options.get('y'))
         error_stop = options.get('error')
         opera = options.get('opera')
         loggerText('[{}]: opera={}, x={}, y={}, button={}, clicks={}, error_stop={}'
@@ -182,7 +182,7 @@ def run(step):
         clickImage(image=opera, error_stop=error_stop, clicks=clicks, button=button, x=x, y=y)
     elif step_type == '判断图片':
         opera = options.get('opera')
-        wait_time = int(options.get('waitTime'))
+        wait_time = float(options.get('waitTime'))
         error_stop = options.get('error')
 
         children = step.get('children')
@@ -214,8 +214,8 @@ def run(step):
                    .format(step_type, opera))
         writeCharacter(character=opera)
     elif step_type == '单击坐标':
-        x = int(options.get('x'))
-        y = int(options.get('y'))
+        x = float(options.get('x'))
+        y = float(options.get('y'))
         button = options.get('button')
         clicks = options.get('clicks')
         loggerText('[{}]: x={}, y={}, button={} clicks={}'
@@ -226,7 +226,7 @@ def run(step):
             clicks = 2
         clickPosition(x=x, y=y, button=button, clicks=clicks)
     elif step_type == '等待':
-        wait_time = int(options.get('waitTime'))
+        wait_time = float(options.get('waitTime'))
         loggerText('[{}]: waitTime={}'
                    .format(step_type, wait_time))
         wait(sleep=wait_time)
