@@ -45,7 +45,7 @@ watch(
     (val) => {
       emits('update:value', val)
     },
-    { deep: true, immediate: true }
+    { deep: true }
 )
 
 onMounted(() => {
