@@ -12,7 +12,7 @@
     "dist"
   ],
   "mac": {
-    "artifactName": "Python自动化工具_${version}.${ext}",
+    "artifactName": "Auto Tool_${version}.${ext}",
     "target": [
       "dmg"
     ]
@@ -27,7 +27,7 @@
       }
     ],
     "icon": "public/favicon.ico",
-    "artifactName": "Python自动化工具_${version}.${ext}"
+    "artifactName": "Auto Tool_${version}.${ext}"
   },
   "nsis": {
     "oneClick": false,

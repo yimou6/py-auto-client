@@ -82,8 +82,13 @@ export function script_create({ title }) {
  * @param filename {string}
  */
 export const script_del = ({ filename }) => {
-    rmDir(join(dataDir, filename))
-    rmdirSync(join(dataDir, filename))
+    try {
+        rmDir(join(dataDir, filename))
+        rmdirSync(join(dataDir, filename))
+        return replyData(1, '删除成功')
+    } catch (e) {
+        return replyData(0, e.toString())
+    }
 }
 
 /**
@@ -231,7 +236,6 @@ const updateStepList = (stepList, ids, type, step, opera) => {
                     addStepItem(stepList, stepList[i], step, type, i)
                 }
                 if (opera === '删除') {
-                    stepList.splice(i, 1)
                     // 如果该步骤应用了图片则删除该图片
                     const needCopyImage = ['点击图片', '判断图片']
                     if (needCopyImage.includes(stepList[i].type)) {
@@ -239,6 +243,7 @@ const updateStepList = (stepList, ids, type, step, opera) => {
                             unlinkSync(stepList[i].options.opera)
                         }
                     }
+                    stepList.splice(i, 1)
                 }
                 if (opera === '修改') {
                     Object.keys(step).forEach(key => {
@@ -257,15 +262,15 @@ const updateStepList = (stepList, ids, type, step, opera) => {
 }
 
 const addStepItem = (stepList, findStep, step, type, index) => {
-    if (type === '添加上一步') {
+    if (type === '上一步') {
         stepList.splice(index, 0, step)
-    } else if (type === '添加下一步') {
+    } else if (type === '下一步') {
         stepList.splice(index + 1, 0, step)
     } else {
         if (findStep.children) {
-            if (type === '判断成功步骤') {
+            if (type === '成功步骤') {
                 findStep.children.unshift(step)
-            } else if (type === '判断失败步骤') {
+            } else if (type === '失败步骤') {
                 if (findStep.children[0].childKey === 'success') {
                     findStep.children.push(step)
                 } else {
@@ -291,7 +296,7 @@ export function script_get() {
     // 获取文件夹列表
     const dirList = readdirSync(dataDir)
     let list = []
-    if (dirList.length === 0) return list
+    if (dirList.length === 0) return replyData(1, '查询成功', list)
 
     // 读取配置文件config.json
     dirList.forEach((item: string) => {

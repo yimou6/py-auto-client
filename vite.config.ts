@@ -6,21 +6,12 @@ import electron from 'vite-electron-plugin'
 import { customStart } from 'vite-electron-plugin/plugin'
 import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 rmSync('dist-electron', { recursive: true, force: true })
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    AutoImport({
-      resolvers: [ElementPlusResolver()],
-    }),
-    Components({
-      resolvers: [ElementPlusResolver()],
-    }),
     vue(),
     electron({
       include: ['electron'],

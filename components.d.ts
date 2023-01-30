@@ -7,24 +7,5 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    Button: typeof import('./src/components/EButton/button.vue')['default']
-    ClickImage: typeof import('./src/components/StepDialog/components/clickImage.vue')['default']
-    ClickPosition: typeof import('./src/components/StepDialog/components/clickPosition.vue')['default']
-    CreateScript: typeof import('./src/components/CreateScript/index.vue')['default']
-    Dialog: typeof import('./src/components/EDialog/dialog.vue')['default']
-    Form: typeof import('./src/components/EForm/form.vue')['default']
-    FormItem: typeof import('./src/components/EForm/form-item.vue')['default']
-    Input: typeof import('./src/components/EInput/input.vue')['default']
-    JudgeDate: typeof import('./src/components/StepDialog/components/judgeDate.vue')['default']
-    JudgeImage: typeof import('./src/components/StepDialog/components/judgeImage.vue')['default']
-    Keyboard: typeof import('./src/components/StepDialog/components/keyboard.vue')['default']
-    KeyboardHot: typeof import('./src/components/StepDialog/components/keyboardHot.vue')['default']
-    LoopStep: typeof import('./src/components/StepDialog/components/loopStep.vue')['default']
-    MouseRightMenu: typeof import('./src/components/MouseRightMenu/MouseRightMenu.vue')['default']
-    Step: typeof import('./src/components/Step/Step.vue')['default']
-    StepDialog: typeof import('./src/components/StepDialog/index.vue')['default']
-    StepItem: typeof import('./src/components/Step/StepItem.vue')['default']
-    WaitTime: typeof import('./src/components/StepDialog/components/waitTime.vue')['default']
-    WriteChar: typeof import('./src/components/StepDialog/components/writeChar.vue')['default']
   }
 }

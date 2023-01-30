@@ -4,7 +4,6 @@ import * as sysIpcMain from './sys.ipcMain'
 
 // @ts-ignore
 import { IpcMainFunc, IpcEventMap } from '../../../src/types'
-import {script_del} from "./step.ipcMain";
 
 const ipcMainFunc: IpcMainFunc<IpcEventMap> = {
     openExplorer: (data) => sysIpcMain.openExplorer(data),

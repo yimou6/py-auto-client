@@ -35,7 +35,9 @@ export interface IArea {
 }
 
 export interface IScript {
+    id: string
     title: string
+    type: string
     filename: string
     createdAt: string
     updatedAt: string

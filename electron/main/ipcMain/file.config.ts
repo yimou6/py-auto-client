@@ -8,8 +8,7 @@ start python start.py
 `
 
 export const pyStr =
-`
-import sys
+`import sys
 import pyautogui
 import datetime
 import time
@@ -101,7 +100,7 @@ def judgeDate(day_type, day, success, fail, last):
             for last_task in last:
                 run(last_task)
     if day_type == '1':
-        if datetime.datetime.now().weekday() == day:
+        if datetime.datetime.now().weekday() - 1 == int(day):
             if success is not None:
                 for success_task in success:
                     run(success_task)
@@ -124,7 +123,7 @@ def keyboardPress(key, presses=1):
     pyautogui.press(key, presses=presses, interval=0.25)
 
 
-# 快捷键
+# 组合键
 def keyboardHotkey(hotkey):
     with pyautogui.hold(hotkey[0]):
         pyautogui.press(hotkey[1])
@@ -162,7 +161,7 @@ def run(step):
 
     options = step.get('options')
 
-    if step_type == '快捷键':
+    if step_type == '组合键':
         hotkey = options.get('hotkey')
         loggerText('[{}]: hotkey={}'.format(step_type, hotkey))
         keyboardHotkey(hotkey=hotkey)
@@ -175,15 +174,27 @@ def run(step):
         opera = options.get('opera')
         loggerText('[{}]: opera={}, x={}, y={}, button={}, clicks={}, error_stop={}'
                    .format(step_type, opera, x, y, button, clicks, error_stop))
-        if clicks == 'single':
+        if button == '左键':
+            button = 'left'
+        else:
+            button = 'right'
+        if clicks == '单击':
             clicks = 1
         else:
             clicks = 2
+        if error_stop == '继续':
+            error_stop = 'continue'
+        else:
+            error_stop = 'stop'
         clickImage(image=opera, error_stop=error_stop, clicks=clicks, button=button, x=x, y=y)
     elif step_type == '判断图片':
         opera = options.get('opera')
         wait_time = float(options.get('waitTime'))
         error_stop = options.get('error')
+        if error_stop == '继续':
+            error_stop = 'continue'
+        else:
+            error_stop = 'stop'
 
         children = step.get('children')
         success = []
@@ -218,6 +229,14 @@ def run(step):
         y = float(options.get('y'))
         button = options.get('button')
         clicks = options.get('clicks')
+        if button == '左键':
+            button = 'left'
+        else:
+            button = 'right'
+        if clicks == '单击':
+            clicks = 1
+        else:
+            clicks = 2
         loggerText('[{}]: x={}, y={}, button={} clicks={}'
                    .format(step_type, x, y, button, clicks))
         if clicks == 'single':
@@ -232,14 +251,12 @@ def run(step):
         wait(sleep=wait_time)
     elif step_type == '循环':
         presses = int(options.get('presses'))
-
         children = step.get('children')
         success = []
         if type(children) == list:
             for _children in children:
                 if _children.get('childKey') == 'success':
                     success.append(_children)
-
         loggerText('[{}]: presses={}'
                    .format(step_type, presses))
         if success:
@@ -247,6 +264,10 @@ def run(step):
     elif step_type == '判断时间':
         presses = options.get('presses')
         day = options.get('day')
+        if presses == '每周':
+            presses = '1'
+        else:
+            presses = '2'
 
         children = step.get('children')
         success = []
@@ -276,5 +297,4 @@ def readStep():
 
 
 readStep()
-
 `
