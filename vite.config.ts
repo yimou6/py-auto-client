@@ -1,5 +1,4 @@
 import { rmSync } from 'fs'
-import path from 'path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-electron-plugin'

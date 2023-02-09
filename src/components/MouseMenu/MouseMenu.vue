@@ -64,6 +64,7 @@ const handleClose = () => {
 <template>
     <div class="mouse-menu" v-if="visible" v-click-outside="handleClose" :style="{ top: x + 'px', left: y + 'px' }"
         @click="handleClick">
+        <div data-menu="从此步开始运行" v-if="!value.childKey">从此步开始运行</div>
         <div data-menu="下一步">下一步</div>
         <div data-menu="上一步">上一步</div>
         <template v-if="showOtherMenu || showFailLastMenu">

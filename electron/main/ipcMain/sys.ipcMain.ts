@@ -7,20 +7,6 @@ export async function openExplorer({ filename }) {
     await shell.openPath(join(dataDir, filename))
 }
 
-export function selectImage() {
-    return dialog.showOpenDialogSync({
-        title: '选择图片',
-        defaultPath: app.getPath('pictures'),
-        filters: [
-            {
-                name: 'Images',
-                extensions: ['jpg', 'png']
-            }
-        ],
-        properties: ['openFile']
-    })
-}
-
 export const step_image = () => {
     return dialog.showOpenDialogSync({
         title: '选择图片',
@@ -34,8 +20,10 @@ export const step_image = () => {
     })
 }
 
-export function runCmd({ cmd }) {
-    exec('start.bat', {
+export function runCmd({ cmd, id }: { cmd: string, id?: string }) {
+    let command = 'python start.py'
+    if (id) command += ` --id=${id}`
+    exec(command, {
         cwd: join(app.getPath('userData'), 'step', cmd)
     })
 }

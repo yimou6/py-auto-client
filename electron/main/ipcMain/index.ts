@@ -2,6 +2,7 @@ import { ipcMain } from 'electron'
 import * as stepIpcMain from './step.ipcMain'
 import * as sysIpcMain from './sys.ipcMain'
 
+
 // @ts-ignore
 import { IpcMainFunc, IpcEventMap } from '../../../src/types'
 
@@ -24,4 +25,6 @@ export default function registerIpcMain () {
         ipcMain.handle(key, (event, args) => ipcMainFunc[key](args))
     }
 }
+
+
 

@@ -1,11 +1,21 @@
 <script lang="ts" setup>
-defineProps<{
+import { computed } from 'vue'
+const props = defineProps<{
     visible: boolean,
     title?: string,
     showClose?: boolean
+    width?: string
 }>()
 
 const emits = defineEmits(['update:visible', 'close'])
+
+const styles = computed(() => {
+    let width
+    if (props.width) {
+        width = props.width
+    }
+    return { width }
+})
 
 const handleClose = () => {
     emits('update:visible', false)
@@ -17,7 +27,7 @@ const handleClose = () => {
     <Teleport to="body">
         <Transition name="dialog-animate">
             <div class="dialog" v-if="visible">
-                <div class="dialog-warp">
+                <div class="dialog-warp" :style="styles">
                     <div class="dialog-title">
                         {{ title }}
                         <span v-if="showClose" class="dialog-close" @click="handleClose">

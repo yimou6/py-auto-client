@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3755765 */
-  src: url('iconfont.woff2?t=1675056156844') format('woff2'),
-       url('iconfont.woff?t=1675056156844') format('woff'),
-       url('iconfont.ttf?t=1675056156844') format('truetype');
+  src: url('iconfont.woff2?t=1675595834026') format('woff2'),
+       url('iconfont.woff?t=1675595834026') format('woff'),
+       url('iconfont.ttf?t=1675595834026') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,22 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-arrow-top:before {
+  content: "\eb8a";
+}
+
+.icon-arrow-right:before {
+  content: "\eb8b";
+}
+
+.icon-arrow-bottom:before {
+  content: "\eb8c";
+}
+
+.icon-arrow-left:before {
+  content: "\eb8e";
 }
 
 .icon-zanwushuju:before {

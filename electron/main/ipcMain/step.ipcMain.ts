@@ -6,7 +6,7 @@ import {
 import { join } from 'path'
 import { existsMkdir, copyImage, rmDir } from '../utils'
 import { dataDir } from '../utils'
-import { batStr, pyStr } from './file.config'
+import { pyStr } from './file.config'
 
 /**
  * 返回字段格式
@@ -63,10 +63,10 @@ export function script_create({ title }) {
             pyStr
         )
         // 新建bat脚本
-        writeFileSync(
-            join(dir, 'start.bat'),
-            batStr
-        )
+        // writeFileSync(
+        //     join(dir, 'start.bat'),
+        //     batStr
+        // )
     } catch (e) {
         // 如果创建失败则删除全部已创建的文件和文件夹
         script_del({

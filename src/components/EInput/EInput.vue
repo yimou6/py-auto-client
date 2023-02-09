@@ -1,10 +1,19 @@
 <script lang="ts" setup>
 import { shallowRef, onMounted, computed } from 'vue'
 
-const props = defineProps<{
-    value: string
-}>()
-const emits = defineEmits(['update:value'])
+const props = withDefaults(defineProps<{
+  value?: string | number,
+  prepend?: string,
+  append?: string,
+  type?: 'text' | 'number'
+}>(), {
+  type: 'text'
+})
+const emits = defineEmits([
+    'update:value',
+    'change',
+    'blur'
+])
 const inputRef = shallowRef<HTMLInputElement>()
 const _ref = computed(() => inputRef.value)
 
@@ -22,29 +31,54 @@ onMounted(() => {
     setNativeInputValue()
 })
 
+function getValue(e: Event) {
+  let { value }: { value: number | string } = e.target as HTMLInputElement
+  if (props.type === 'number') {
+    value = Number(value)
+  }
+  return value
+}
+
 const handleInput = (e: Event) => {
-    let { value } = e.target as HTMLInputElement
-    emits('update:value', value)
+    emits('update:value', getValue(e))
+}
+const handleChange = (e: Event) => {
+    emits('change', getValue(e))
+}
+const handleBlur = (e: Event) => {
+    emits('blur', getValue(e))
 }
 </script>
 
 <template>
     <div class="e-input">
-        <input type="text" ref="inputRef" @input="handleInput">
+        <div v-if="prepend" class="e-input-prepend">{{ prepend }}</div>
+        <input type="text" ref="inputRef" @input="handleInput" @change="handleChange" @blur="handleBlur">
+      <div v-if="append" class="e-input-prepend">{{ append }}</div>
     </div>
 </template>
 
 <style lang="scss">
 .e-input {
-    border: 1px solid #ddd;
+    border: 1px solid #dfdfdf;
     border-radius: 4px;
-    padding: 2px 12px;
-    display: inline-block;
+    height: 30px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
     input {
         outline: none;
         border: none;
-        padding: 0;
         width: 100%;
+        padding: 0 8px;
+        height: 30px;
+    }
+    .e-input-prepend {
+        background-color: #efefef;
+        height: 30px;
+        line-height: 30px;
+        padding: 0 10px;
+        border-right: 1px solid #dfdfdf;
     }
 }
 </style>

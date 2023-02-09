@@ -86,6 +86,10 @@ input[type='number'] {
 
   label {
     margin-right: 10px;
+    width: 80px;
+    text-align: right;
+    height: 30px;
+    line-height: 30px;
   }
 }
 
