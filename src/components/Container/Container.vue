@@ -5,13 +5,13 @@ import { storeToRefs } from 'pinia'
 import Step from '../Step/Step.vue'
 import MouseMenu from '../MouseMenu/MouseMenu.vue'
 import StepModify from '../StepModify/index.vue'
-import { IStep } from '../Step/step'
+import { CStep } from '../../types/step.class'
 import Dialog from '../Dialog/Dialog.vue'
 import EButton from '../EButton/EButton.vue'
 
 const store = useStepStore()
 const { activeScriptId, activeScript } = storeToRefs(store)
-const stepList = ref<IStep[]>([])
+const stepList = ref<CStep[]>([])
 const visible = ref(false)
 const menuTop = ref(0)
 const menuLeft = ref(0)
@@ -59,24 +59,7 @@ const handleScroll = () => {
 
 const stepVisible = ref(false)
 const title = ref('新增')
-const nowStep = ref<IStep>({
-  id: '',
-  type: '点击图片',
-  nextWait: '5',
-  options: {
-    button: '左键',
-    clicks: '单击',
-    error: '继续',
-    opera: '',
-    x: '2',
-    y: '3',
-    waitTime: '30',
-    presses: '10',
-    hotkey: ['', '', ''],
-    old_opera: '',
-    day: '1'
-  }
-})
+const nowStep = ref<CStep>(new CStep())
 // 选中的step id 数组
 const ids = ref<string[]>([])
 // 鼠标菜单字段
@@ -86,7 +69,7 @@ const menuStr = ref('')
 const activeStepId = ref('')
 
 // 展开鼠标右键菜单
-const handleClickRight = (e: PointerEvent, data: IStep[]) => {
+const handleClickRight = (e: PointerEvent, data: CStep[]) => {
   visible.value = true
   // menuTop.value = e.y > 370 ? e.y - 202 : e.y
   menuLeft.value = e.x
@@ -129,28 +112,11 @@ const handleMenu = (menu: string) => {
   }
 }
 const stepClose = () => {
-  nowStep.value = {
-    id: '',
-    type: '点击图片',
-    nextWait: '5',
-    options: {
-      button: '左键',
-      clicks: '单击',
-      error: '继续',
-      opera: '',
-      x: '2',
-      y: '3',
-      waitTime: '30',
-      presses: '10',
-      hotkey: ['', '', ''],
-      old_opera: '',
-      day: '1'
-    }
-  }
+  nowStep.value = new CStep()
   ids.value = []
   menuStr.value = ''
 }
-const handleRefresh = (val: IStep[]) => {
+const handleRefresh = (val: CStep[]) => {
   stepList.value = val
 }
 const handleClose = () => {

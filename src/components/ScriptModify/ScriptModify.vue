@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue'
-import useStepStore from '../../stores/step'
 import { storeToRefs } from 'pinia'
+import useStepStore from '../../stores/step'
 import Dialog from '../Dialog/Dialog.vue'
 import EInput from '../EInput/EInput.vue'
 import EButton from '../EButton/EButton.vue'
@@ -48,6 +48,10 @@ const handleClose = (id?: string) => {
     }
 }
 
+const handleEnter = () => {
+  handleSubmit()
+}
+
 const handleSubmit = async () => {
     if (tipsStatus.value === 'success') {
         if (props.title === '新增') {
@@ -81,8 +85,8 @@ const scriptUpdate = async () => {
 <template>
     <Dialog :visible.sync="visible" :title="title" :show-close="showClose" @close="handleClose">
         <div class="form-item script-input">
-            <label>名称</label>
-            <EInput v-model:value="scriptTitle"></EInput>
+            <label style="width: 40px">名称</label>
+            <EInput v-model:value="scriptTitle" style="width: 100%" @enter="handleEnter"></EInput>
         </div>
         <div class="tips" :class="tipsStatus">
             名称仅支持

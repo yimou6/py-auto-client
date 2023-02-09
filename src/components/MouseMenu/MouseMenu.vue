@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { default as vClickOutside } from '../../directives/click-outside'
-import { IStep } from '../Step/step'
+import { CStep } from '../../types/step.class'
 
 const props = defineProps<{
     visible: boolean
     x: number
     y: number,
-    value: IStep
+    value: CStep
 }>()
 const emits = defineEmits(['update:visible', 'menu'])
 

@@ -12,7 +12,8 @@ const props = withDefaults(defineProps<{
 const emits = defineEmits([
     'update:value',
     'change',
-    'blur'
+    'blur',
+    'enter'
 ])
 const inputRef = shallowRef<HTMLInputElement>()
 const _ref = computed(() => inputRef.value)
@@ -48,12 +49,15 @@ const handleChange = (e: Event) => {
 const handleBlur = (e: Event) => {
     emits('blur', getValue(e))
 }
+const handleEnter = (e: Event) => {
+  emits('enter', getValue(e))
+}
 </script>
 
 <template>
     <div class="e-input">
         <div v-if="prepend" class="e-input-prepend">{{ prepend }}</div>
-        <input type="text" ref="inputRef" @input="handleInput" @change="handleChange" @blur="handleBlur">
+        <input type="text" ref="inputRef" @input="handleInput" @change="handleChange" @blur="handleBlur" @keydown.enter="handleEnter">
       <div v-if="append" class="e-input-prepend">{{ append }}</div>
     </div>
 </template>

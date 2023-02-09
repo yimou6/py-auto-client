@@ -2,7 +2,7 @@
   <div class="keyboard">
     <div v-for="(item, index) of KEYBOARD" :key="index" class="key-line" @click="handleClick">
       <span v-for="it of item"
-            :key="it"
+            :key="it.value"
             :style="styles(it.size)"
             :class="classes(it.value)"
             :data-value="it.value">{{ it.name }}</span>

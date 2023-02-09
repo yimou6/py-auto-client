@@ -12,9 +12,7 @@ const notify = function (options = {}) {
     }
     const vm = h(
         Notification,
-        props,
-        // @ts-ignore
-        null
+        props
     )
 
     render(vm, container)
