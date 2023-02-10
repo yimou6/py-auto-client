@@ -22,7 +22,7 @@ export const step_image = () => {
 
 export function runCmd({ cmd, id }: { cmd: string, id?: string }) {
     let command = 'python start.py'
-    if (id) command += ` --id=${id}`
+    if (id) command += ` ${id}`
     exec(command, {
         cwd: join(app.getPath('userData'), 'step', cmd)
     })

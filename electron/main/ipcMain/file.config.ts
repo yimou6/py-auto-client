@@ -52,7 +52,6 @@ def click_image(button, clicks, x, y, img=None, tag=None):
         else:
             abscissa = position.x + x
             ordinate = position.y + y
-    pyautogui.moveTo(abscissa, ordinate, 0.3, pyautogui.easeInBounce)
     pyautogui.click(abscissa, ordinate, clicks, 0.3, button)
 
 
