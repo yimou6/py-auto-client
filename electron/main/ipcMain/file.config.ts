@@ -9,17 +9,12 @@
 
 export const pyStr =
 `
-import argparse
 import ctypes
 import datetime
 import sys
 import time
 import json
-
 import pyautogui
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--id', type=str, default=None)
 
 
 def is_admin():
@@ -169,19 +164,18 @@ def run_step(step):
     time.sleep(next_wait)
 
 
+def get_id():
+    if len(sys.argv) == 2:
+        return sys.argv[1]
+    else:
+        return None
+
+
+
 def main():
-    step_id = parser.parse_args().id
-    start = True
-    if step_id is not None:
-        start = False
     with open('step.json', encoding='utf8') as data:
         for step in json.load(data):
-            if start:
-                run_step(step)
-            else:
-                if step_id == step.get('id'):
-                    start = True
-                    run_step(step)
+            run_step(step)
 
 
 if is_admin():
@@ -190,5 +184,4 @@ else:
     if sys.version_info[0] == 3:
         ctypes.windll.shell32.ShellExecuteW(None, 'runas', sys.executable, __file__, None, 1)
     main()
-
 `
