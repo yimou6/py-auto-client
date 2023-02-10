@@ -68,11 +68,11 @@ const handleSubmit = () => {
   const temp: CStep = toRaw(formModel.value)
   const childKey = temp.childKey || menuChildKeyMap[props.menu]
   let info = delObjUndefined(Object.assign(temp, { childKey }))
-
+  console.log(info)
   if (props.title.indexOf('新增') > -1) {
-    stepAdd(info)
+    // stepAdd(info)
   } else {
-    stepUpdate(info)
+    // stepUpdate(info)
   }
 }
 

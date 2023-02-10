@@ -2,7 +2,7 @@
   <div class="form-item">
     <label>点击次数</label>
     <div class="form-item-content">
-      <NumberInput :model-value="presses" :min="1" :max="50" :step="1"></NumberInput>
+      <NumberInput :model-value="presses" :min="1" :max="50" :step="1" @change="handlePresses"></NumberInput>
     </div>
   </div>
   <Keyboard :model-value="opera" @change="handleOpera"></Keyboard>
@@ -22,7 +22,7 @@ const emits = defineEmits([
 ])
 
 const handleOpera = (value: string) => emits('update:opera', value)
-
+const handlePresses = (val: number) => emits('update:presses', val)
 </script>
 
 <style lang="scss">
