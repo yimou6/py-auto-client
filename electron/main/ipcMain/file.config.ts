@@ -1,11 +1,11 @@
-// export const batStr =
-// `
-// @echo off
-// %1 mshta vbscript:CreateObject("Shell.Application").ShellExecute("cmd.exe","/c %~s0 ::","","runas",1)(window.close)&&exit
-// cd /d "%~dp0"
-//
-// start python start.py
-// `
+export const batStr =
+`
+@echo off
+%1 mshta vbscript:CreateObject("Shell.Application").ShellExecute("cmd.exe","/c %~s0 ::","","runas",1)(window.close)&&exit
+cd /d "%~dp0"
+
+start python start.py
+`
 
 export const pyStr =
 `
@@ -68,7 +68,6 @@ def judge_image(img, tag, wait_time, steps):
     sleep = 1  # 每1秒查找一次图片
     while i < wait_time:
         position = get_image_position(img)
-        print('第{}次：{}'.format(i, position))
         if position is None:
             time.sleep(sleep)
             i = i + sleep

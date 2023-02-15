@@ -66,13 +66,13 @@ const handleSubmit = () => {
     return notify({ type: 'danger', message: valid })
   }
   const temp: CStep = toRaw(formModel.value)
-  const childKey = temp.childKey || menuChildKeyMap[props.menu]
+  const childKey = menuChildKeyMap[props.menu] || temp.childKey
   let info = delObjUndefined(Object.assign(temp, { childKey }))
   console.log(info)
   if (props.title.indexOf('新增') > -1) {
-    // stepAdd(info)
+    stepAdd(info)
   } else {
-    // stepUpdate(info)
+    stepUpdate(info)
   }
 }
 
