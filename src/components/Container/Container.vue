@@ -5,13 +5,14 @@ import { storeToRefs } from 'pinia'
 import Step from '../Step/Step.vue'
 import MouseMenu from '../MouseMenu/MouseMenu.vue'
 import StepModify from '../StepModify/index.vue'
-import { CStep } from '../../types/step.class'
+import { IStepForm } from "../StepModify/step.modify"
 import Dialog from '../Dialog/Dialog.vue'
 import EButton from '../EButton/EButton.vue'
+import HeaderBar from './HeaderBar.vue'
 
 const store = useStepStore()
 const { activeScriptId, activeScript } = storeToRefs(store)
-const stepList = ref<CStep[]>([])
+const stepList = ref<IStepForm[]>([])
 const visible = ref(false)
 const menuTop = ref(0)
 const menuLeft = ref(0)
@@ -32,24 +33,6 @@ watch(
     { immediate: true }
 )
 
-const handleUpdate = () => {
-  store.changeEditScript(true)
-}
-const handleRun = () => {
-  window.ipcRenderer.sendEvent('runCmd', {
-    cmd: store.activeScriptId
-  })
-}
-const handleDel = () => {
-  store.changeDelScript(true)
-}
-const handleOpenFile = () => {
-  window.ipcRenderer.sendEvent('openExplorer', {
-    filename: store.activeScriptId
-  })
-}
-const handleHelp = () => { }
-
 const handleScroll = () => {
   if (visible.value) {
     visible.value = false
@@ -59,7 +42,7 @@ const handleScroll = () => {
 
 const stepVisible = ref(false)
 const title = ref('新增')
-const nowStep = ref<CStep>(new CStep())
+const nowStep = ref<IStepForm>(new IStepForm())
 // 选中的step id 数组
 const ids = ref<string[]>([])
 // 鼠标菜单字段
@@ -69,11 +52,12 @@ const menuStr = ref('')
 const activeStepId = ref('')
 
 // 展开鼠标右键菜单
-const handleClickRight = (e: PointerEvent, data: CStep[]) => {
+const handleClickRight = (e: PointerEvent, data: IStepForm[]) => {
   visible.value = true
   // menuTop.value = e.y > 370 ? e.y - 202 : e.y
   menuLeft.value = e.x
 
+  // @ts-ignore
   ids.value = data.map(it => it.id)
   activeStepId.value = ids.value[ids.value.length - 1]
 
@@ -112,11 +96,11 @@ const handleMenu = (menu: string) => {
   }
 }
 const stepClose = () => {
-  nowStep.value = new CStep()
+  nowStep.value = new IStepForm()
   ids.value = []
   menuStr.value = ''
 }
-const handleRefresh = (val: CStep[]) => {
+const handleRefresh = (val: IStepForm[]) => {
   stepList.value = val
 }
 const handleClose = () => {
@@ -137,22 +121,9 @@ const handleSubmit = async () => {
 <template>
   <div class="container">
     <template v-if="!!activeScriptId">
-      <div class="container-nav">
-        <div class="nav-title">
-          <span>{{ activeScript.title }}</span>
-          <div>
-            <span>创建于 {{ activeScript.createdAt }}</span>
-            <span>修改于 {{ activeScript.updatedAt }}</span>
-          </div>
-        </div>
-        <ul>
-          <li @click="handleOpenFile">打开文件夹</li>
-          <li @click="handleDel">删除</li>
-          <li @click="handleUpdate">修改</li>
-          <li @click="handleRun">运行</li>
-          <!-- <li @click="handleHelp">帮助</li> -->
-        </ul>
-      </div>
+
+      <HeaderBar />
+
       <div class="container-step" @scroll="handleScroll">
         <Step v-for="item of stepList" :key="item['id']" :data="item" :active-id="activeStepId" @click-right="handleClickRight"></Step>
 
@@ -185,69 +156,10 @@ const handleSubmit = async () => {
 .container {
   width: calc(100% - 200px);
 
-  &-nav {
-    height: 50px;
-    border-bottom: 1px solid #dfdfdf;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-right: 10px;
-
-    .nav-title {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-
-      &>span {
-        font-weight: bolder;
-        font-size: 16px;
-        margin-right: 12px;
-      }
-
-      &>div {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: #a1a1a1;
-
-        span {
-          font-weight: 500;
-          font-size: 12px;
-        }
-      }
-    }
-
-    ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      font-size: 12px;
-      color: #666666;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      height: 50px;
-
-      li {
-        cursor: pointer;
-        &:hover {
-          color: #00ab46;
-          text-decoration: underline;
-        }
-      }
-
-      li+li {
-        margin-left: 10px;
-      }
-    }
-  }
-
   &-step {
     overflow-x: hidden;
     overflow-y: auto;
-    max-height: 500px;
+    max-height: 490px;
 
     .add-btn {
       color: #00ca53;

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Radio from '../../Radio/Radio.vue'
 import EInput from '../../EInput/EInput.vue'
-import { MOUSES, CLICKS, ERROR_NEXT } from '../data'
+import { MOUSES, CLICKS, ERROR_NEXT } from '../step.modify'
 const props = defineProps<{
     button?: string,
     clicks?: number,

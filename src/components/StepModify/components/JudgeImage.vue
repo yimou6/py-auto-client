@@ -2,7 +2,7 @@
 import EInput from "../../EInput/EInput.vue";
 import NumberInput from "../../NumberInput/NumberInput.vue";
 import Radio from "../../Radio/Radio.vue";
-import { ERROR_NEXT } from '../data'
+import { ERROR_NEXT } from '../step.modify'
 
 const props = defineProps<{
   waitTime?: number,

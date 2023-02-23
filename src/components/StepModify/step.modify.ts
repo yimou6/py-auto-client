@@ -7,29 +7,17 @@ export const STEP_TYPES = [
     { label: '等待', value: '等待' },
     { label: '循环', value: '循环' }
 ]
-export const STEP_TYPES_CHILD = {
+export const STEP_TYPES_CHILD: Record<string, any> = {
     '鼠标点击': [
-        { label: '点击坐标', value: '点击坐标' },
-        { label: '点击图片', value: '点击图片' }
+        { label: '点击图片', value: '点击图片' },
+        { label: '点击坐标', value: '点击坐标' }
     ],
     '键盘按键': [
-        { label: '直接按键', value: '直接按键' },
+        { label: '单键', value: '单键' },
+        { label: '组合键', value: '组合键' },
         { label: '输入字符', value: '输入字符' }
     ],
 }
-export const STEP_TYPES0 = [
-    { label: '点击图片', value: '点击图片' },
-    { label: '判断图片', value: '判断图片' },
-    { label: '键盘按键', value: '键盘按键' },
-    { label: '组合键', value: '组合键' }
-]
-export const STEP_TYPES1 = [
-    { label: '等待', value: '等待' },
-    { label: '输入字符', value: '输入字符' },
-    { label: '单击坐标', value: '单击坐标' },
-    { label: '循环', value: '循环' },
-    { label: '判断时间', value: '判断时间' }
-]
 
 export const MOUSES = [
     { label: '左键', value: 'left' },
@@ -47,8 +35,8 @@ export const ERROR_NEXT = [
 ]
 
 export const DAY_TYPES = [
-    { label: '每周', value: 1 },
-    { label: '每月', value: 2 }
+    { label: '每周', value: '每周' },
+    { label: '每月', value: '每月' }
 ]
 
 export const WEEK = [
@@ -153,4 +141,103 @@ export const menuChildKeyMap: Record<string, string> = {
     '成功步骤': 'success',
     '失败步骤': 'fail',
     '最后步骤': 'finally'
+}
+
+export class IStepForm {
+    id?: string
+    childKey?: string
+    children?: IStepForm[]
+    type: string // 类型
+    secType: string // 二级类型
+    nextWait: number // 下一步等待时间
+    button: 'left' | 'right' // 鼠标按键
+    clicks: number // 按键次数
+    x: number // 坐标x
+    y: number // 坐标y
+    error: 'stop' | 'continue' // 错误处理
+    wait: number // 等待时间
+    hotkey: string[] // 组合键
+    keyboard: string // 键盘按键
+    chart: string // 输入字符
+    img: string // 图片
+    oldImag: string // 原图片
+    frequency: number // 次数
+    dayType: string // 时间类型
+    day: number // 具体时间
+    desc: string // 备注
+
+    constructor() {
+        this.type = '鼠标点击'
+        this.secType = '点击图片'
+        this.nextWait = 1
+        this.button = 'left'
+        this.clicks = 1
+        this.x = 0
+        this.y = 0
+        this.error = 'continue'
+        this.wait = 10
+        this.keyboard = ''
+        this.hotkey = []
+        this.chart = ''
+        this.img = ''
+        this.oldImag = ''
+        this.frequency = 1
+        this.dayType = '每周'
+        this.day = 1
+        this.desc = ''
+    }
+
+    // 删除“类型”多余的字段
+    formatFormKeyValue() {
+        let temp: Record<string, any> = {}
+
+        temp.nextWait = this.nextWait
+        temp.desc = this.desc
+        // secType -> type
+        if (['鼠标点击', '键盘按键'].includes(this.type)) {
+            temp.type = this.secType
+        } else {
+            temp.type = this.type
+        }
+
+        // 列出各个“类型”所需的字段
+        const NEED_KEY: Record<string, Array<keyof IStepForm>> = {
+            '点击图片': ['button', 'clicks', 'error', 'x', 'y', 'wait', 'img', 'oldImag'],
+            '点击坐标': ['button', 'clicks', 'x', 'y'],
+            '单键': ['frequency', 'keyboard'],
+            '组合键': ['hotkey'],
+            '输入字符': ['chart'],
+            '移动光标': ['x', 'y'],
+            '判断图片': ['wait', 'error', 'img', 'oldImag'],
+            '判断时间': ['dayType', 'day'],
+            '等待': ['wait'],
+            '循环': ['frequency'],
+        }
+        NEED_KEY[temp.type].forEach(key => {
+            temp[key] = this[key]
+        })
+
+        if (this.id) temp.id = this.id
+        if (this.childKey) temp.childKey = this.childKey
+
+        return temp
+    }
+
+    setValue(data: IStepForm) {
+        const arr = Object.keys(data) as Array<keyof IStepForm>
+        arr.forEach((key) => {
+            if (key !== 'children') {
+                // @ts-ignore
+                this[key] = data[key]
+            }
+        })
+        if (['点击图片', '点击坐标'].includes(data.type)) {
+            this.type = '鼠标点击'
+            this.secType = data.type
+        }
+        if (['单键', '组合键', '输入字符'].includes(data.type)) {
+            this.type = '键盘按键'
+            this.secType = data.type
+        }
+    }
 }

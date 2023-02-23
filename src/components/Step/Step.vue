@@ -84,7 +84,7 @@ const handleClickRight = (e: Event, val: IStepForm[]) => {
 
           <div class="step-tag-warning">
             <span class="warn-title">下一步等待</span>
-            <span class="warn-desc">{{ data.nexitWait }}秒</span>
+            <span class="warn-desc">{{ data.nextWait }}秒</span>
           </div>
 
           <div class="step-error" :class="data.error" v-if="['判断图片', '点击图片'].includes(data.type)">

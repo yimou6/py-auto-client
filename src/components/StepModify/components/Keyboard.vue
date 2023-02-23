@@ -16,7 +16,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { KEYBOARD } from '../data'
+import { KEYBOARD } from '../step.modify'
 
 const props = withDefaults(defineProps<{
   modelValue?: string | string[],
@@ -80,6 +80,8 @@ const handleRemove = (index: number) => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 460px;
+  margin: 0 auto 10px;
 }
 .key-line {
   display: flex;
@@ -102,13 +104,13 @@ const handleRemove = (index: number) => {
       margin-left: 2px;
     }
     &:hover {
-      color: #00ab46;
-      border-color: #00ab46;
+      color: #B99B6B;
+      border-color: #B99B6B;
     }
     &.active {
       color: #ffffff;
-      background-color: #00ab46;
-      border-color: #00ab46;
+      background-color: #B99B6B;
+      border-color: #B99B6B;
     }
   }
 }

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
 
 interface RadioProps {
     data: any[],
@@ -62,8 +61,8 @@ const handleClick = (e: Event) => {
 
                 &.active {
                     color: #ffffff;
-                    background-color: #00ca53;
-                    border-color: #00ca53;
+                    background-color: #B99B6B;
+                    border-color: #B99B6B;
                 }
             }
         }
@@ -78,8 +77,8 @@ const handleClick = (e: Event) => {
                 }
 
                 &.active {
-                    color: #00ca53;
-                    border-color: #00ca53;
+                    color: #B99B6B;
+                    border-color: #B99B6B;
                 }
             }
         }
@@ -117,15 +116,15 @@ const handleClick = (e: Event) => {
                 margin-right: 4px;
                 box-sizing: border-box;
                 &:hover {
-                    border-color: #00ca53;
+                    border-color: #B99B6B;
                 }
             }
 
             &.active {
-                color: #00ca53;
+                color: #B99B6B;
                 .radio-dot {
                     border-width: 3px;
-                    border-color: #00ca53;
+                    border-color: #B99B6B;
                 }
             }
         }

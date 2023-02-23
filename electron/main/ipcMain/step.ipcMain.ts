@@ -130,9 +130,9 @@ export const step_get = ({ filename }) => {
     }
 }
 
+
+const needCopyImage = ['点击图片', '判断图片']
 export const step_add = ({ ids, filename, type, info }) => {
-    // console.log('step add:', { ids, filename, type, info })
-    // console.log(JSON.stringify(info))
     const { code, msg, data } = step_get({ filename })
     if (code === 0) {
         return replyData(0, `数据获取失败:${msg}`)
@@ -142,17 +142,17 @@ export const step_add = ({ ids, filename, type, info }) => {
     // 添加ID字段
     stepInfo.id = `${Date.now()}`
     // 处理图片
-    const needCopyImage = ['点击图片', '判断图片']
     if (needCopyImage.includes(stepInfo.type)) {
-        stepInfo.options.opera = copyImage(
-            stepInfo.options.opera,
+        stepInfo.img = copyImage(
+            stepInfo.img,
             join(dataDir, filename, 'images')
         )
     }
 
     const { data: _data } = data
     if (type) {
-        updateStepList(_data, ids, type, stepInfo, '添加')
+        updateList(_data, ids, stepInfo, type)
+        // updateStepList(_data, ids, type, stepInfo, '添加')
     } else {
         // type 无值、空字符串 - 直接添加下一步
         _data.push(stepInfo)
@@ -175,7 +175,7 @@ export const step_del = ({ filename, ids }) => {
     }
     if (ids.length > 0) {
         const { data: _data } = data
-        updateStepList(_data, ids, '', {}, '删除')
+        updateList(_data, ids, {}, '删除')
         try {
             writeFileSync(
                 join(dataDir, filename, 'step.json'),
@@ -198,24 +198,23 @@ export const step_modify = ({ filename, ids, info }) => {
 
     const stepInfo = { ...info }
     // 处理图片
-    const needCopyImage = ['点击图片', '判断图片']
     if (needCopyImage.includes(stepInfo.type)) {
-        if (stepInfo.options.old_opera !== stepInfo.options.opera) {
+        if (stepInfo.oldImg !== stepInfo.img) {
             // 删除原图片，再移动现图片到对应位置
-            if (existsSync(stepInfo.options.old_opera)) {
-                unlinkSync(stepInfo.options.old_opera)
+            if (existsSync(stepInfo.oldImg)) {
+                unlinkSync(stepInfo.oldImg)
             }
 
-            stepInfo.options.opera = copyImage(
-                stepInfo.options.opera,
+            stepInfo.img = copyImage(
+                stepInfo.img,
                 join(dataDir, filename, 'images')
             )
         }
-        delete stepInfo.options.old_opera
+        delete stepInfo.oldImg
     }
 
     const { data: _data } = data
-    updateStepList(_data, ids, '', info, '修改')
+    updateList(_data, ids, stepInfo, '修改')
     try {
         writeFileSync(
             join(dataDir, filename, 'step.json'),
@@ -224,6 +223,59 @@ export const step_modify = ({ filename, ids, info }) => {
         return replyData(1, '操作成功', _data)
     } catch (e) {
         return replyData(0, `操作失败:${e.toString()}`)
+    }
+}
+
+
+/**
+ * 更新 步骤 列表
+ * @param list
+ * @param ids
+ * @param data
+ * @param opera 上一步，下一步，成功步骤，失败步骤，修改，删除
+ */
+function updateList(list: Array<Record<string, any>>, ids: string[], data: any, opera: string) {
+    if (ids && ids.length > 0) {
+        const index = list.findIndex(item => item.id === ids[0])
+        ids.splice(0, 1)
+        if (ids.length > 0) {
+            updateList(list[index].children, ids, data, opera)
+        } else {
+            if (opera === '上一步') {
+                list.splice(index, 0, data)
+            } else if (opera === '下一步') {
+                list.splice(index + 1, 0, data)
+            } else if (opera === '修改') {
+                let temp = data
+                if (list[index].children) temp = Object.assign(temp, { children: list[index].children })
+                list[index] = temp
+            } else if (opera === '删除') {
+                if (needCopyImage.includes(list[index].type)) {
+                    // 删除信息的同时删除图片文件
+                    if (existsSync(list[index].img)) {
+                        unlinkSync(list[index].img)
+                    }
+                }
+                list.splice(index, 1)
+            } else {
+                if (!list[index].children) {
+                    list[index].children = []
+                }
+                if (opera === '成功步骤') {
+                    list[index].children.unshift(data)
+                } else if (opera === '失败步骤') {
+                    if (list[index].children.length === 0) {
+                        list[index].children.push(data)
+                    } else if (list[index].children[0].childKey === 'success') {
+                        list[index].children.push(data)
+                    } else {
+                        list[index].children.unshift(data)
+                    }
+                } else {
+                    list[index].children.push(data)
+                }
+            }
+        }
     }
 }
 
@@ -237,7 +289,6 @@ const updateStepList = (stepList, ids, type, step, opera) => {
                 }
                 if (opera === '删除') {
                     // 如果该步骤应用了图片则删除该图片
-                    const needCopyImage = ['点击图片', '判断图片']
                     if (needCopyImage.includes(stepList[i].type)) {
                         if (existsSync(stepList[i].options.opera)) {
                             unlinkSync(stepList[i].options.opera)
