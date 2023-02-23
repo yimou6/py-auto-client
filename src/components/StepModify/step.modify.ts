@@ -1,3 +1,22 @@
+export const STEP_TYPES = [
+    { label: '鼠标点击', value: '鼠标点击' },
+    { label: '键盘按键', value: '键盘按键' },
+    { label: '移动光标', value: '移动光标' },
+    { label: '判断图片', value: '判断图片' },
+    { label: '判断时间', value: '判断时间' },
+    { label: '等待', value: '等待' },
+    { label: '循环', value: '循环' }
+]
+export const STEP_TYPES_CHILD = {
+    '鼠标点击': [
+        { label: '点击坐标', value: '点击坐标' },
+        { label: '点击图片', value: '点击图片' }
+    ],
+    '键盘按键': [
+        { label: '直接按键', value: '直接按键' },
+        { label: '输入字符', value: '输入字符' }
+    ],
+}
 export const STEP_TYPES0 = [
     { label: '点击图片', value: '点击图片' },
     { label: '判断图片', value: '判断图片' },
