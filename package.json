@@ -1,6 +1,6 @@
 {
   "name": "auto-tool",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "main": "dist-electron/main/index.js",
   "description": "A simple tool",
   "license": "MIT",
